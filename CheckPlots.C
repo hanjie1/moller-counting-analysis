@@ -29,9 +29,11 @@ void CheckPlots(){
      double thisx=-333, thisy=-333, thisz=-333, thise=-333, thisp=-333, thist=-333, thisr=-333;
      double thispx=-333, thispy=-333, thispz=-333, thispr=-333;
      double thisth_tg=-333, thisph_tg=-333;
+     int thisevent = 0;
      TFile *newfile = new TFile("trackhits.root","RECREATE","hits for valid tracks");
      if(!newfile->IsOpen()) return;  
      TTree *newT = new TTree("T","data");
+     newT->Branch("event", &thisevent, "thisevent/I");
      newT->Branch("trid", &thistrid, "thistrid/I");
      newT->Branch("det", &thisdet, "thisdet/I");
      newT->Branch("x", &thisx, "thisx/D");
@@ -94,6 +96,7 @@ void CheckPlots(){
               remollGenericDetectorHit_t hit = fHit->at(jj);
 	      int tmptrid = hit.trid-1;
               if(hit.pid==11 && hit.mtrid==0 && valid_trk[tmptrid]==1 ){           // two eletrons from the particle gun, for moller events
+		   thisevent = ii;
 		   thistrid = hit.trid;
 		   thisdet = hit.det;
 		   thisx = hit.x;
