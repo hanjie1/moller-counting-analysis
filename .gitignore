@@ -1,1 +1,5 @@
 *.root
+build/
+build/*
+*.so
+*.d

@@ -1,4 +1,37 @@
-//#include "remolltypes.hh"
+#include <sstream>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+#include <TApplication.h>
+#include <TRint.h>
+#include <TSystem.h>
+
+#include <TStyle.h>
+#include <TPaveStats.h>
+#include <TCanvas.h>
+#include <TGraph.h>
+#include <TMultiGraph.h>
+#include <TLegend.h>
+#include <TGraphErrors.h>
+#include <TFrame.h>
+#include <TObjArray.h>
+#include <TVector2.h>
+#include <TLatex.h>
+
+#include <TFile.h>
+#include <TChain.h>
+#include <TH2F.h>
+#include <TH2D.h>
+
+#include "TTree.h"
+#include "TFile.h"
+#include "remolltypes.hh"
+#include "GenRoottypes.h"
+
+using namespace std;
+
 int CheckExist( int det[], int thisdet, int nsize  ){
      int is_exist=0;
      for(int ii=0; ii<nsize; ii++){
@@ -7,16 +40,13 @@ int CheckExist( int det[], int thisdet, int nsize  ){
 	   break;
 	}
      }
-
      return is_exist;
 }
 
-
-void CheckPlots(){
+int main(){
      TChain *T = new TChain("T");
      T->AddFile("/home/hanjie/moller/remoll/remoll_sievein.root");
 
-     const int ntrk = 2;  // number of tracks that we care about
      const int ndet = 3;
      int valid_det[ndet] = {60, 30, 28};  // detector I want to be fired: sieve: 60, GEM: 30, MainDetector: 28
 
@@ -25,35 +55,27 @@ void CheckPlots(){
      T->SetBranchAddress("hit", &fHit);
      T->SetBranchAddress("part", &fPart);
 
-     int thistrid=-1, thisdet=-1;
-     double thisx=-333, thisy=-333, thisz=-333, thise=-333, thisp=-333, thist=-333, thisr=-333;
-     double thispx=-333, thispy=-333, thispz=-333, thispr=-333;
-     double thisth_tg=-333, thisph_tg=-333;
-     int thisevent = 0;
+     vector <newHit> thishit;
+     vector <newPart> thispart;
+
      TFile *newfile = new TFile("trackhits.root","RECREATE","hits for valid tracks");
-     if(!newfile->IsOpen()) return;  
+     if(!newfile->IsOpen()) return 0;  
      TTree *newT = new TTree("T","data");
-     newT->Branch("event", &thisevent, "thisevent/I");
-     newT->Branch("trid", &thistrid, "thistrid/I");
-     newT->Branch("det", &thisdet, "thisdet/I");
-     newT->Branch("x", &thisx, "thisx/D");
-     newT->Branch("y", &thisy, "thisy/D");
-     newT->Branch("z", &thisz, "thisz/D");
-     newT->Branch("r", &thisr, "thisr/D");
-     newT->Branch("e", &thise, "thise/D");   // energy
-     newT->Branch("p", &thisp, "thisp/D");   // momentum
-     newT->Branch("px", &thispx, "thispx/D");   // momentum x
-     newT->Branch("py", &thispy, "thispy/D");   // momentum y
-     newT->Branch("pz", &thispz, "thispz/D");   // momentum z
-     newT->Branch("pr", &thispr, "thispr/D");   // momentum z
-     newT->Branch("t", &thist, "thist/D");   // time
-     newT->Branch("th_tg", &thisth_tg, "thisth_tg/D");
-     newT->Branch("ph_tg", &thisph_tg, "thisph_tg/D");
+     newT->Branch("hit", &thishit);
+     newT->Branch("part", &thispart);
   
      Int_t nentries = T->GetEntries();
      for(Int_t ii=0; ii < nentries; ii++){
          T->GetEntry(ii);
          Int_t nhits = fHit->size();
+
+	 thishit.clear();
+	 thispart.clear();
+ 
+         const int ntrk = 2;      // number of tracks that we care about
+	if(fPart->size()!=ntrk){
+	   cout<<"Warning: the number of tracks is smaller than the avaliable tracks"<<endl;
+	}
 
          int fire_det[ntrk][8];    // save the fired detector id for each track id
          for(int kk=0; kk<ntrk; kk++){
@@ -92,38 +114,44 @@ void CheckPlots(){
 
 	 if(total_validtrk>1) cout<<"There are "<<total_validtrk<<" valid tracks for event "<<ii<<endl;
 
+	 for(int hh =0; hh<ntrk; hh++){
+		remollEventParticle_t  part = fPart->at(hh);	     
+		if(valid_trk[hh]==1){
+		    newPart apart;
+		    apart.trid = part.trid;
+		    apart.th = part.th;
+		    apart.ph = part.ph;
+		    apart.vz = part.vz;
+	 	    thispart.push_back(apart);
+		}
+	 }
+
 	 for(Int_t jj=0; jj<nhits; jj++){   // loop all the hits to find the hits that form the valid track
               remollGenericDetectorHit_t hit = fHit->at(jj);
+
+	      newHit ahit;
+	      newPart apart;
+
 	      int tmptrid = hit.trid-1;
               if(hit.pid==11 && hit.mtrid==0 && valid_trk[tmptrid]==1 ){           // two eletrons from the particle gun, for moller events
-		   thisevent = ii;
-		   thistrid = hit.trid;
-		   thisdet = hit.det;
-		   thisx = hit.x;
-		   thisy = hit.y;
-	   	   thisz = hit.z;
-		   thisr = hit.r;
-		   thise = hit.e;
-		   thisp = hit.p;
-		   thispx = hit.px;
-		   thispy = hit.py;
-		   thispz = hit.pz;
-		   thispr = sqrt(thispx*thispx + thispy*thispy);
-		   thist = hit.t;
-
-		   remollEventParticle_t part = fPart->at(tmptrid);
-		   if(part.trid==thistrid){
-	              thisth_tg = part.th;
-		      thisph_tg = part.ph;
-		   }
-		   else{
-	              cout<<"Somehting wrong with the particles trid "<<part.trid<<"  "<<thistrid<<"  "<<ii<<endl;
-
-		   }
-
-		   newT->Fill();
+		   ahit.trid = hit.trid;
+		   ahit.det = hit.det;
+		   ahit.x = hit.x;
+		   ahit.y = hit.y;
+	   	   ahit.z = hit.z;
+		   ahit.r = hit.r;
+		   ahit.e = hit.e;
+		   ahit.p = hit.p;
+		   ahit.px = hit.px;
+		   ahit.py = hit.py;
+		   ahit.pz = hit.pz;
+		   ahit.pr = sqrt(ahit.px*ahit.px + ahit.py*ahit.py);
+		   ahit.t = hit.t;
+		   thishit.push_back(ahit);
 	      }
 	 }
+
+	newT->Fill();
      }
 
      newT->Write(); 
