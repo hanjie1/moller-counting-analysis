@@ -49,16 +49,23 @@ bool comparetrid(detHit h1, detHit h2)
 } 
 
 int main(){
+
+     TString filename;
+     cout<<"Which root file:     ";
+     cin>>filename;
+
      TChain *T = new TChain("T");
-     T->AddFile("/home/hanjie/moller/remoll/remollout_sieveout.root");
+     T->AddFile(Form("/home/hanjie/moller/remoll/%s.root",filename.Data()));
 
      const int ndet = 3;
      int valid_det[ndet] = {60, 30, 28};  // detector I want to be fired: sieve: 60, GEM: 30, MainDetector: 28
 
      vector < remollGenericDetectorHit_t > *fHit = 0;
      vector < remollEventParticle_t > *fPart = 0;
+     double fRate;
      T->SetBranchAddress("hit", &fHit);
      T->SetBranchAddress("part", &fPart);
+     T->SetBranchAddress("rate", &fRate);
 
      vector<detHit> sieve;
      vector<detHit> ring;
@@ -68,8 +75,9 @@ int main(){
      vector<detHit> gem_b2;  // tracking detecotr back 2 plane
      vector<tgPart> target;
      int ntrack;
+     double rate;
 
-     TFile *newfile = new TFile("Rootfiles/trackhits_sieveout.root","RECREATE","hits for valid tracks");
+     TFile *newfile = new TFile(Form("/home/hanjie/moller/optics_analysis/Rootfiles/trackhits_%s.root",filename.Data()),"RECREATE","hits for valid tracks");
      if(!newfile->IsOpen()) return 0;  
      TTree *newT = new TTree("T","data");
      newT->Branch("sieve", &sieve);
@@ -80,6 +88,7 @@ int main(){
      newT->Branch("gem_b2", &gem_b2);
      newT->Branch("tg", &target);
      newT->Branch("ntrk", &ntrack,"ntrack/I");
+     newT->Branch("rate", &rate,"rate/D");
   
      Int_t nentries = T->GetEntries();
      for(Int_t ii=0; ii < nentries; ii++){
@@ -140,6 +149,7 @@ int main(){
 	 if(total_validtrk==0) continue;
 
 	 ntrack = total_validtrk;
+	 rate = fRate;
 
 	 for(int hh =0; hh<ntrk; hh++){
 		remollEventParticle_t  part = fPart->at(hh);	     
@@ -196,8 +206,8 @@ int main(){
 	  sort(gem_b2.begin(), gem_b2.end(), comparetrid);
 	}
 
-	if(nsieve>1 || nring>1 || ngem>4)
-         cout<<"Mutiple hits than expected (nsieve, nring, ngem): "<<nsieve<<"  "<<nring<<"  "<<ngem<<endl;
+	if(nsieve>ntrack || nring>ntrack || ngem>(4*ntrack))
+	  printf("Event %d has multiple hits than expected (nsieve, nring, ngem): %d, %d, %d\n",ii, nsieve, nring, ngem);
 
 	newT->Fill();
      }
