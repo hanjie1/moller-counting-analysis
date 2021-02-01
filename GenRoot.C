@@ -43,9 +43,14 @@ int CheckExist( int det[], int thisdet, int nsize  ){
      return is_exist;
 }
 
+bool comparetrid(detHit h1, detHit h2) 
+{ 
+    return (h1.trid < h2.trid); 
+} 
+
 int main(){
      TChain *T = new TChain("T");
-     T->AddFile("/home/hanjie/moller/remoll/remoll_sievein.root");
+     T->AddFile("/home/hanjie/moller/remoll/remollout_sieveout.root");
 
      const int ndet = 3;
      int valid_det[ndet] = {60, 30, 28};  // detector I want to be fired: sieve: 60, GEM: 30, MainDetector: 28
@@ -55,22 +60,40 @@ int main(){
      T->SetBranchAddress("hit", &fHit);
      T->SetBranchAddress("part", &fPart);
 
-     vector <newHit> thishit;
-     vector <newPart> thispart;
+     vector<detHit> sieve;
+     vector<detHit> ring;
+     vector<detHit> gem_f1;  // tracking detecotr front 1 plane
+     vector<detHit> gem_f2;  // tracking detecotr front 2 plane
+     vector<detHit> gem_b1;  // tracking detecotr back 1 plane
+     vector<detHit> gem_b2;  // tracking detecotr back 2 plane
+     vector<tgPart> target;
+     int ntrack;
 
-     TFile *newfile = new TFile("trackhits.root","RECREATE","hits for valid tracks");
+     TFile *newfile = new TFile("Rootfiles/trackhits_sieveout.root","RECREATE","hits for valid tracks");
      if(!newfile->IsOpen()) return 0;  
      TTree *newT = new TTree("T","data");
-     newT->Branch("hit", &thishit);
-     newT->Branch("part", &thispart);
+     newT->Branch("sieve", &sieve);
+     newT->Branch("ring", &ring);
+     newT->Branch("gem_f1", &gem_f1);
+     newT->Branch("gem_f2", &gem_f2);
+     newT->Branch("gem_b1", &gem_b1);
+     newT->Branch("gem_b2", &gem_b2);
+     newT->Branch("tg", &target);
+     newT->Branch("ntrk", &ntrack,"ntrack/I");
   
      Int_t nentries = T->GetEntries();
      for(Int_t ii=0; ii < nentries; ii++){
          T->GetEntry(ii);
          Int_t nhits = fHit->size();
 
-	 thishit.clear();
-	 thispart.clear();
+	 sieve.clear();
+	 ring.clear();
+	 gem_f1.clear();
+	 gem_f2.clear();
+	 gem_b1.clear();
+	 gem_b2.clear();
+	 target.clear();
+	 ntrack=0;
  
          const int ntrk = 2;      // number of tracks that we care about
 	if(fPart->size()!=ntrk){
@@ -112,44 +135,69 @@ int main(){
 	   else valid_trk[nn]=0;
 	 }
 
-	 if(total_validtrk>1) cout<<"There are "<<total_validtrk<<" valid tracks for event "<<ii<<endl;
+	 //if(total_validtrk>1) cout<<"There are "<<total_validtrk<<" valid tracks for event "<<ii<<endl;
+
+	 if(total_validtrk==0) continue;
+
+	 ntrack = total_validtrk;
 
 	 for(int hh =0; hh<ntrk; hh++){
 		remollEventParticle_t  part = fPart->at(hh);	     
 		if(valid_trk[hh]==1){
-		    newPart apart;
+		    tgPart apart;
 		    apart.trid = part.trid;
+		    if(apart.trid != (hh+1)) cout<<"It's weird here"<<endl;
 		    apart.th = part.th;
 		    apart.ph = part.ph;
 		    apart.vz = part.vz;
-	 	    thispart.push_back(apart);
+	 	    target.push_back(apart);
 		}
 	 }
 
+
+	 int nsieve=0, nring=0, ngem=0;
 	 for(Int_t jj=0; jj<nhits; jj++){   // loop all the hits to find the hits that form the valid track
               remollGenericDetectorHit_t hit = fHit->at(jj);
 
-	      newHit ahit;
-	      newPart apart;
-
 	      int tmptrid = hit.trid-1;
               if(hit.pid==11 && hit.mtrid==0 && valid_trk[tmptrid]==1 ){           // two eletrons from the particle gun, for moller events
-		   ahit.trid = hit.trid;
-		   ahit.det = hit.det;
-		   ahit.x = hit.x;
-		   ahit.y = hit.y;
-	   	   ahit.z = hit.z;
-		   ahit.r = hit.r;
-		   ahit.e = hit.e;
-		   ahit.p = hit.p;
-		   ahit.px = hit.px;
-		   ahit.py = hit.py;
-		   ahit.pz = hit.pz;
-		   ahit.pr = sqrt(ahit.px*ahit.px + ahit.py*ahit.py);
-		   ahit.t = hit.t;
-		   thishit.push_back(ahit);
+		 detHit ahit;
+		 ahit.trid = hit.trid;
+		 ahit.x = hit.x;
+		 ahit.y = hit.y;
+	   	 ahit.z = hit.z;
+		 ahit.r = hit.r;
+		 ahit.e = hit.e;
+		 ahit.p = hit.p;
+		 ahit.px = hit.px;
+		 ahit.py = hit.py;
+		 ahit.pz = hit.pz;
+		 ahit.t = hit.t;
+
+		 int detid = hit.det;
+		 if(detid==28){ ring.push_back(ahit); nring++;}
+		 if(detid==60){ sieve.push_back(ahit); nsieve++;}
+		 if(detid==30){
+		    if(ahit.z==19279.5) gem_f1.push_back(ahit);
+		    if(ahit.z==19779.5) gem_f2.push_back(ahit);
+		    if(ahit.z==20193.5) gem_b1.push_back(ahit);
+		    if(ahit.z==20693.5) gem_b2.push_back(ahit);
+		    ngem++;
+		 }
 	      }
 	 }
+
+	if(ntrack>1){
+ 	  sort(sieve.begin(), sieve.end(), comparetrid);
+	  sort(ring.begin(), ring.end(), comparetrid);
+	  sort(gem_f1.begin(), gem_f1.end(), comparetrid);
+	  sort(gem_f2.begin(), gem_f2.end(), comparetrid);
+	  sort(gem_b1.begin(), gem_b1.end(), comparetrid);
+	  sort(gem_b2.begin(), gem_b2.end(), comparetrid);
+	}
+
+	if(nsieve>1 || nring>1 || ngem>4)
+         cout<<"Mutiple hits than expected (nsieve, nring, ngem): "<<nsieve<<"  "<<nring<<"  "<<ngem<<endl;
 
 	newT->Fill();
      }

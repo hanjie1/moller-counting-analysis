@@ -4,10 +4,10 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ struct newHit+;
-#pragma link C++ struct newPart+;
+#pragma link C++ struct detHit+;
+#pragma link C++ struct tgPart+;
 
-#pragma link C++ struct vector<newHit>+;
-#pragma link C++ struct vector<newPart>+;
+#pragma link C++ struct vector<detHit>+;
+#pragma link C++ struct vector<tgPart>+;
 
 #endif
