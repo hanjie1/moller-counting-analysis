@@ -64,22 +64,22 @@ void MakePlots(){
      hthr_ring->GetYaxis()->SetTitle("r"); 
      hthr_ring->SetTitle("r vs th at ring (sieve.r>35.4)");
 
-     TH2F *hxy_gemf1 = new TH2F("hxy_gemf1","y vs. x distribution at the GEM f1",500,-1500,1500,500,-1500,1500);
+     TH2F *hrp_th_gemf1 = new TH2F("hrp_th_gemf1","r' vs. th distribution at the GEM f1",500,0,0.025,500,0.03,0.08);
      TH2F *hthr_gemf1 = new TH2F("hthr_gemf1","r vs. theta distribution at the GEM f1",500,0,0.022,500,500,1500);
-     TH2F *hxy_gemf2 = new TH2F("hxy_gemf2","y vs. x distribution at the GEM f2",500,-1500,1500,500,-1500,1500);
+     TH2F *hrp_th_gemf2 = new TH2F("hrp_th_gemf2","r' vs. th distribution at the GEM f2",500,0,0.025,500,0.03,0.08);
      TH2F *hthr_gemf2 = new TH2F("hthr_gemf2","r vs. theta distribution at the GEM f2",500,0,0.022,500,500,1500);
-     TH2F *hxy_gemb1 = new TH2F("hxy_gemb1","y vs. x distribution at the GEM b1",500,-1500,1500,500,-1500,1500);
+     TH2F *hrp_th_gemb1 = new TH2F("hrp_th_gemb1","r' vs. th distribution at the GEM b1",500,0,0.025,500,0.03,0.08);
      TH2F *hthr_gemb1 = new TH2F("hthr_gemb1","r vs. theta distribution at the GEM b1",500,0,0.022,500,500,1500);
-     TH2F *hxy_gemb2 = new TH2F("hxy_gemb2","y vs. x distribution at the GEM b2",500,-1500,1500,500,-1500,1500);
+     TH2F *hrp_th_gemb2 = new TH2F("hrp_th_gemb2","r' vs. th distribution at the GEM b2",500,0,0.025,500,0.03,0.08);
      TH2F *hthr_gemb2 = new TH2F("hthr_gemb2","r vs. theta distribution at the GEM b2",500,0,0.022,500,500,1500);
 
      TCanvas *c2 = new TCanvas("c2","c2",1500,1500);
-     c2->Divide(2,4);
+     c2->Divide(2,2);
      c2->cd(1);
-     T->Draw("gem_f1.y:gem_f1.x>>hxy_gemf1",nodump*"rate","COLZ"); 
-     hxy_gemf1->GetXaxis()->SetTitle("x"); 
-     hxy_gemf1->GetYaxis()->SetTitle("y"); 
-     hxy_gemf1->SetTitle("y vs x at gem_f1 (sieve.r>35.4)");
+     T->Draw("sqrt(gem_f1.px*gem_f1.px+gem_f1.py*gem_f1.py)/gem_f1.pz:tg.th>>hrp_th_gemf1",nodump*"rate","COLZ"); 
+     hrp_th_gemf1->GetXaxis()->SetTitle("th"); 
+     hrp_th_gemf1->GetYaxis()->SetTitle("r'"); 
+     hrp_th_gemf1->SetTitle("r' vs th at gem_f1 (sieve.r>35.4)");
 
      c2->cd(2);
      T->Draw("gem_f1.r:tg.th>>hthr_gemf1",nodump*"rate","COLZ"); 
@@ -88,10 +88,10 @@ void MakePlots(){
      hthr_gemf1->SetTitle("r vs th at gem_f1 (sieve.r>35.4)");
 
      c2->cd(3);
-     T->Draw("gem_f2.y:gem_f2.x>>hxy_gemf2",nodump*"rate","COLZ"); 
-     hxy_gemf2->GetXaxis()->SetTitle("x"); 
-     hxy_gemf2->GetYaxis()->SetTitle("y"); 
-     hxy_gemf2->SetTitle("y vs x at gem_f2 (sieve.r>35.4)");
+     T->Draw("sqrt(gem_f2.px*gem_f2.px+gem_f2.py*gem_f2.py)/gem_f2.pz:tg.th>>hrp_th_gemf2",nodump*"rate","COLZ"); 
+     hrp_th_gemf2->GetXaxis()->SetTitle("th"); 
+     hrp_th_gemf2->GetYaxis()->SetTitle("r'"); 
+     hrp_th_gemf2->SetTitle("r' vs th at gem_f2 (sieve.r>35.4)");
 
      c2->cd(4);
      T->Draw("gem_f2.r:tg.th>>hthr_gemf2",nodump*"rate","COLZ"); 
@@ -99,36 +99,38 @@ void MakePlots(){
      hthr_gemf2->GetYaxis()->SetTitle("r"); 
      hthr_gemf2->SetTitle("r vs th at gem_f2 (sieve.r>35.4)");
 
-     c2->cd(5);
-     T->Draw("gem_b1.y:gem_b1.x>>hxy_gemb1",nodump*"rate","COLZ"); 
-     hxy_gemb1->GetXaxis()->SetTitle("x"); 
-     hxy_gemb1->GetYaxis()->SetTitle("y"); 
-     hxy_gemb1->SetTitle("y vs x at gem_b1 (sieve.r>35.4)");
+     TCanvas *c3 = new TCanvas("c3","c3",1500,1500);
+     c3->Divide(2,2);
+     c3->cd(1);
+     T->Draw("sqrt(gem_b1.px*gem_b1.px+gem_b1.py*gem_b1.py)/gem_b1.pz:tg.th>>hrp_th_gemb1",nodump*"rate","COLZ"); 
+     hrp_th_gemb1->GetXaxis()->SetTitle("th"); 
+     hrp_th_gemb1->GetYaxis()->SetTitle("r'"); 
+     hrp_th_gemb1->SetTitle("r' vs th at gem_b1 (sieve.r>35.4)");
 
-     c2->cd(6);
+     c3->cd(2);
      T->Draw("gem_b1.r:tg.th>>hthr_gemb1",nodump*"rate","COLZ"); 
      hthr_gemb1->GetXaxis()->SetTitle("tg.th"); 
      hthr_gemb1->GetYaxis()->SetTitle("r"); 
      hthr_gemb1->SetTitle("r vs th at gem_b1 (sieve.r>35.4)");
 
-     c2->cd(7);
-     T->Draw("gem_b2.y:gem_b2.x>>hxy_gemb2",nodump*"rate","COLZ"); 
-     hxy_gemb2->GetXaxis()->SetTitle("x"); 
-     hxy_gemb2->GetYaxis()->SetTitle("y"); 
-     hxy_gemb2->SetTitle("y vs x at gem_b2 (sieve.r>35.4)");
+     c3->cd(3);
+     T->Draw("sqrt(gem_b2.px*gem_b2.px+gem_b2.py*gem_b2.py)/gem_b2.pz:tg.th>>hrp_th_gemb2",nodump*"rate","COLZ"); 
+     hrp_th_gemb2->GetXaxis()->SetTitle("th"); 
+     hrp_th_gemb2->GetYaxis()->SetTitle("r'"); 
+     hrp_th_gemb2->SetTitle("r' vs th at gem_b2 (sieve.r>35.4)");
 
-     c2->cd(8);
+     c3->cd(4);
      T->Draw("gem_b2.r:tg.th>>hthr_gemb2",nodump*"rate","COLZ"); 
      hthr_gemb2->GetXaxis()->SetTitle("tg.th"); 
      hthr_gemb2->GetYaxis()->SetTitle("r"); 
      hthr_gemb2->SetTitle("r vs th at gem_b2 (sieve.r>35.4)");
 
-     TH2F *hrprime_th_ring = new TH2F("hrprime_th_ring","r' vs. th distribution at the main detector",500,0,0.025,500,0.0,0.08);
-     TCanvas *c3 = new TCanvas("c3","c3",1500,1500);
-     c3->Divide(2,1);
-     c3->cd(1);
+     TH2F *hrprime_th_ring = new TH2F("hrprime_th_ring","r' vs. th distribution at the main detector",500,0,0.025,500,0.03,0.08);
+     TCanvas *c4 = new TCanvas("c4","c4",1500,1500);
+     c4->Divide(2,1);
+     c4->cd(1);
      hthr_ring->Draw("COLZ");
-     c3->cd(2);
+     c4->cd(2);
      T->Draw("sqrt(ring.px*ring.px+ring.py*ring.py)/ring.pz:tg.th>>hrprime_th_ring",nodump*"rate","COLZ");
      hrprime_th_ring->GetXaxis()->SetTitle("tg.th"); 
      hrprime_th_ring->GetYaxis()->SetTitle("r'"); 
