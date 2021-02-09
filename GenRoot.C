@@ -160,6 +160,7 @@ int main(){
 		    apart.th = part.th;
 		    apart.ph = part.ph;
 		    apart.vz = part.vz;
+		    apart.p = part.p;
 	 	    target.push_back(apart);
 		}
 	 }

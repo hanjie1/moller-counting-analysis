@@ -11,5 +11,6 @@ struct tgPart{         // particles at the target from the particle gun
    double th;
    double ph;
    double vz;
+   double p;
    int trid;
 };
