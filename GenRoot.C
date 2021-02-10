@@ -53,6 +53,9 @@ int main(){
      TString filename;
      cout<<"Which root file:     ";
      cin>>filename;
+     int ismoller=0;
+     cout<<"Is it moller scattering?(1=yes, 0=no):  ";
+     cin>>ismoller;
 
      TChain *T = new TChain("T");
      T->AddFile(Form("/home/hanjie/moller/remoll/%s.root",filename.Data()));
@@ -104,7 +107,8 @@ int main(){
 	 target.clear();
 	 ntrack=0;
  
-         const int ntrk = 2;      // number of tracks that we care about
+        const int ntrk=ismoller+1;      // number of tracks that we care about
+
 	if(fPart->size()!=ntrk){
 	   cout<<"Warning: the number of tracks is smaller than the avaliable tracks"<<endl;
 	}
@@ -119,7 +123,7 @@ int main(){
 
          for(Int_t jj=0; jj<nhits; jj++){
            remollGenericDetectorHit_t hit = fHit->at(jj);
-           if(hit.pid==11 && hit.mtrid==0 && (hit.trid==1 || hit.trid==2) ){           // two eletrons from the particle gun, for moller events
+           if(hit.pid==11 && hit.mtrid==0 && (hit.trid==1 || (hit.trid==2 && ismoller==1)) ){           // two eletrons from the particle gun, for moller events
 		int tmpDetID = hit.det;
 		int tmptrkid = hit.trid-1;
 		int is_exist = CheckExist(fire_det[tmptrkid], tmpDetID, 8);

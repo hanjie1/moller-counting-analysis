@@ -1,7 +1,7 @@
 #include "include/GenRoottypes.h"
 
 void MakePlots(){
-
+/*
      TString filename;
      cout<<"Which root file?    ";
      cin>>filename;
@@ -9,28 +9,13 @@ void MakePlots(){
      TFile *f = new TFile(Form("Rootfiles/trackhits_%s.root",filename.Data()));
 
      TTree *T = (TTree*) f->Get("T");
-/*
-     vector<detHit> *sieve=0;
-     vector<detHit> *ring=0;
-     vector<detHit> *gem_f1=0;
-     vector<detHit> *gem_f2=0;
-     vector<detHit> *gem_b1=0;
-     vector<detHit> *gem_b2=0;
-     vector<tgPart> *tg=0;
-
-     int ntrk;
-     double rate;
-
-     T->SetBranchAddress("sieve", &sieve);
-     T->SetBranchAddress("ring", &ring);
-     T->SetBranchAddress("gem_f1", &gem_f1);
-     T->SetBranchAddress("gem_f2", &gem_f2);
-     T->SetBranchAddress("gem_b1", &gem_b1);
-     T->SetBranchAddress("gem_b2", &gem_b2);
-     T->SetBranchAddress("tg", &tg);
-     T->SetBranchAddress("rate", &rate);
-     T->SetBranchAddress("ntrk", &ntrk);
 */
+
+     TString filename="sievein_ep";
+     TChain *T = new TChain("T");
+     T->Add("Rootfiles/trackhits_remoll_sievein_H1_ep_inelastic.root");
+     T->Add("Rootfiles/trackhits_remoll_sievein_H1_ep_elastic.root");
+
      TCut nodump = "sieve.r>35.4";
      
      TH2F *hxy_ring = new TH2F("hxy_ring","y vs. x distribution at the main detector",500,-1500,1500,500,-1500,1500);
@@ -159,9 +144,9 @@ void MakePlots(){
      hphp_gemf1->SetTitle("ph' vs th at gem_f1 (sieve.r>35.4)");
 
      c5->cd(2);
-     T->Draw("atan(gem_f1.x/gem_f1.y)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_gemf1",nodump*"rate","COLZ"); 
+     T->Draw("atan2(gem_f1.y,gem_f1.x)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_gemf1",nodump*"rate","COLZ"); 
      hphp_gemf1->GetXaxis()->SetTitle("tg.ph (deg)"); 
-     hphp_gemf1->GetYaxis()->SetTitle("ph (deg)"); 
+     hphp_gemf1->GetYaxis()->SetTitle("(pi/2-ph) (deg)"); 
      hphp_gemf1->SetTitle("ph vs tg.ph at gem_f1 (sieve.r>35.4)");
 
      c5->cd(3);
@@ -171,9 +156,9 @@ void MakePlots(){
      hphp_gemf2->SetTitle("ph' vs th at gem_f2 (sieve.r>35.4)");
 
      c5->cd(4);
-     T->Draw("atan(gem_f2.x/gem_f2.y)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_gemf2",nodump*"rate","COLZ"); 
+     T->Draw("atan2(gem_f2.y,gem_f2.x)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_gemf2",nodump*"rate","COLZ"); 
      hphp_gemf2->GetXaxis()->SetTitle("tg.ph (deg)"); 
-     hphp_gemf2->GetYaxis()->SetTitle("ph (deg)"); 
+     hphp_gemf2->GetYaxis()->SetTitle("(pi/2-ph) (deg)"); 
      hphp_gemf2->SetTitle("ph vs tg.ph at gem_f2 (sieve.r>35.4)");
 
      TCanvas *c6 = new TCanvas("c6","c6",1500,1500);
@@ -185,9 +170,9 @@ void MakePlots(){
      hphp_gemb1->SetTitle("ph' vs th at gem_b1 (sieve.r>35.4)");
 
      c6->cd(2);
-     T->Draw("atan(gem_b1.x/gem_b1.y)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_gemb1",nodump*"rate","COLZ"); 
+     T->Draw("atan2(gem_b1.y,gem_b1.x)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_gemb1",nodump*"rate","COLZ"); 
      hphp_gemb1->GetXaxis()->SetTitle("tg.ph (deg)"); 
-     hphp_gemb1->GetYaxis()->SetTitle("ph (deg)"); 
+     hphp_gemb1->GetYaxis()->SetTitle("(pi/2-ph) (deg)"); 
      hphp_gemb1->SetTitle("ph vs tg.ph at gem_b1 (sieve.r>35.4)");
 
      c6->cd(3);
@@ -197,9 +182,9 @@ void MakePlots(){
      hphp_gemb2->SetTitle("ph' vs th at gem_b2 (sieve.r>35.4)");
 
      c6->cd(4);
-     T->Draw("atan(gem_b2.x/gem_b2.y)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_gemb2",nodump*"rate","COLZ"); 
+     T->Draw("atan2(gem_b2.y,gem_b2.x)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_gemb2",nodump*"rate","COLZ"); 
      hphp_gemb2->GetXaxis()->SetTitle("tg.ph (deg)"); 
-     hphp_gemb2->GetYaxis()->SetTitle("ph (deg)"); 
+     hphp_gemb2->GetYaxis()->SetTitle("(pi/2-ph) (deg)"); 
      hphp_gemb2->SetTitle("ph vs tg.ph at gem_b2 (sieve.r>35.4)");
 
      TH2F *hphp_ring = new TH2F("hphp_ring","ph' vs. th distribution at the ring",500,0,0.025,500,-0.01,0.01);
@@ -215,21 +200,20 @@ void MakePlots(){
      hphp_ring->SetTitle("ph' vs th at ring (sieve.r>35.4)");
 
      c7->cd(2);
-     T->Draw("atan(ring.x/ring.y)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_ring",nodump*"rate","COLZ"); 
-     hphp_gemf1->GetXaxis()->SetTitle("tg.ph (deg)"); 
-     hphp_gemf1->GetYaxis()->SetTitle("ph (deg)"); 
-     hphp_gemf1->SetTitle("ph vs tg.ph at gem_f1 (sieve.r>35.4)");
-
-
-
-
+     T->Draw("atan2(ring.y,ring.x)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_ring",nodump*"rate","COLZ"); 
+     hph_ring->GetXaxis()->SetTitle("tg.ph (deg)"); 
+     hph_ring->GetYaxis()->SetTitle("pi/2-ph (deg)"); 
+     hph_ring->SetTitle("ph vs tg.ph at ring (sieve.r>35.4)");
 /*
      c1->Print(Form("%s.pdf[",filename.Data()));
      c1->Print(Form("%s.pdf",filename.Data()));
      c2->Print(Form("%s.pdf",filename.Data()));
      c3->Print(Form("%s.pdf",filename.Data()));
      c4->Print(Form("%s.pdf",filename.Data()));
-     c4->Print(Form("%s.pdf]",filename.Data()));
+     c5->Print(Form("%s.pdf",filename.Data()));
+     c6->Print(Form("%s.pdf",filename.Data()));
+     c7->Print(Form("%s.pdf",filename.Data()));
+     c7->Print(Form("%s.pdf]",filename.Data()));
 */
 
      
