@@ -58,17 +58,19 @@ int main(){
      cin>>ismoller;
 
      TChain *T = new TChain("T");
-     T->AddFile(Form("/home/hanjie/moller/remoll/%s.root",filename.Data()));
+     T->AddFile(Form("/home/hanjie/moller/remoll/Rootfiles/%s.root",filename.Data()));
 
      const int ndet = 3;
      int valid_det[ndet] = {60, 30, 28};  // detector I want to be fired: sieve: 60, GEM: 30, MainDetector: 28
 
      vector < remollGenericDetectorHit_t > *fHit = 0;
      vector < remollEventParticle_t > *fPart = 0;
+     remollEvent_t *fev=0;
      double fRate;
      T->SetBranchAddress("hit", &fHit);
      T->SetBranchAddress("part", &fPart);
      T->SetBranchAddress("rate", &fRate);
+     T->SetBranchAddress("ev", &fev);
 
      vector<detHit> sieve;
      vector<detHit> ring;
@@ -77,6 +79,7 @@ int main(){
      vector<detHit> gem_b1;  // tracking detecotr back 1 plane
      vector<detHit> gem_b2;  // tracking detecotr back 2 plane
      vector<tgPart> target;
+     event thisev;
      int ntrack;
      double rate;
 
@@ -90,6 +93,7 @@ int main(){
      newT->Branch("gem_b1", &gem_b1);
      newT->Branch("gem_b2", &gem_b2);
      newT->Branch("tg", &target);
+     newT->Branch("ev", &thisev);
      newT->Branch("ntrk", &ntrack,"ntrack/I");
      newT->Branch("rate", &rate,"rate/D");
   
@@ -105,6 +109,10 @@ int main(){
 	 gem_b1.clear();
 	 gem_b2.clear();
 	 target.clear();
+	 thisev.xs=0;
+	 thisev.W2=0;
+	 thisev.Q2=0;
+
 	 ntrack=0;
  
         const int ntrk=ismoller+1;      // number of tracks that we care about
@@ -154,6 +162,10 @@ int main(){
 
 	 ntrack = total_validtrk;
 	 rate = fRate;
+ 
+ 	 thisev.xs=fev->xs;
+ 	 thisev.Q2=fev->Q2;
+ 	 thisev.W2=fev->W2;
 
 	 for(int hh =0; hh<ntrk; hh++){
 		remollEventParticle_t  part = fPart->at(hh);	     
@@ -168,6 +180,8 @@ int main(){
 	 	    target.push_back(apart);
 		}
 	 }
+
+       
 
 
 	 int nsieve=0, nring=0, ngem=0;

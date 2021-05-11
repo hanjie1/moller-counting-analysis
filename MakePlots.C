@@ -146,7 +146,7 @@ void MakePlots(){
      c5->cd(2);
      T->Draw("atan2(gem_f1.y,gem_f1.x)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_gemf1",nodump*"rate","COLZ"); 
      hphp_gemf1->GetXaxis()->SetTitle("tg.ph (deg)"); 
-     hphp_gemf1->GetYaxis()->SetTitle("(pi/2-ph) (deg)"); 
+     hphp_gemf1->GetYaxis()->SetTitle("ph (deg)"); 
      hphp_gemf1->SetTitle("ph vs tg.ph at gem_f1 (sieve.r>35.4)");
 
      c5->cd(3);
@@ -158,7 +158,7 @@ void MakePlots(){
      c5->cd(4);
      T->Draw("atan2(gem_f2.y,gem_f2.x)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_gemf2",nodump*"rate","COLZ"); 
      hphp_gemf2->GetXaxis()->SetTitle("tg.ph (deg)"); 
-     hphp_gemf2->GetYaxis()->SetTitle("(pi/2-ph) (deg)"); 
+     hphp_gemf2->GetYaxis()->SetTitle("ph (deg)"); 
      hphp_gemf2->SetTitle("ph vs tg.ph at gem_f2 (sieve.r>35.4)");
 
      TCanvas *c6 = new TCanvas("c6","c6",1500,1500);
@@ -172,7 +172,7 @@ void MakePlots(){
      c6->cd(2);
      T->Draw("atan2(gem_b1.y,gem_b1.x)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_gemb1",nodump*"rate","COLZ"); 
      hphp_gemb1->GetXaxis()->SetTitle("tg.ph (deg)"); 
-     hphp_gemb1->GetYaxis()->SetTitle("(pi/2-ph) (deg)"); 
+     hphp_gemb1->GetYaxis()->SetTitle("ph (deg)"); 
      hphp_gemb1->SetTitle("ph vs tg.ph at gem_b1 (sieve.r>35.4)");
 
      c6->cd(3);
@@ -184,7 +184,7 @@ void MakePlots(){
      c6->cd(4);
      T->Draw("atan2(gem_b2.y,gem_b2.x)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_gemb2",nodump*"rate","COLZ"); 
      hphp_gemb2->GetXaxis()->SetTitle("tg.ph (deg)"); 
-     hphp_gemb2->GetYaxis()->SetTitle("(pi/2-ph) (deg)"); 
+     hphp_gemb2->GetYaxis()->SetTitle("ph (deg)"); 
      hphp_gemb2->SetTitle("ph vs tg.ph at gem_b2 (sieve.r>35.4)");
 
      TH2F *hphp_ring = new TH2F("hphp_ring","ph' vs. th distribution at the ring",500,0,0.025,500,-0.01,0.01);
@@ -202,7 +202,7 @@ void MakePlots(){
      c7->cd(2);
      T->Draw("atan2(ring.y,ring.x)*180.0/TMath::Pi():(tg.ph*180.0/TMath::Pi())>>hph_ring",nodump*"rate","COLZ"); 
      hph_ring->GetXaxis()->SetTitle("tg.ph (deg)"); 
-     hph_ring->GetYaxis()->SetTitle("pi/2-ph (deg)"); 
+     hph_ring->GetYaxis()->SetTitle("ph (deg)"); 
      hph_ring->SetTitle("ph vs tg.ph at ring (sieve.r>35.4)");
 /*
      c1->Print(Form("%s.pdf[",filename.Data()));

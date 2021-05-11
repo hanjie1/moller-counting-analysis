@@ -6,6 +6,7 @@
 
 #pragma link C++ struct detHit+;
 #pragma link C++ struct tgPart+;
+#pragma link C++ struct event+;
 
 #pragma link C++ struct vector<detHit>+;
 #pragma link C++ struct vector<tgPart>+;

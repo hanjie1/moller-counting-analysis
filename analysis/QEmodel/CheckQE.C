@@ -1,0 +1,155 @@
+#include "F1F209QE.h"
+
+using namespace TMath;
+void CheckQE(){
+    ifstream file;
+    file.open("12C.dat");
+    
+    if(!file.is_open())return;
+
+    Ssiz_t from=0;
+    TString content,tmp;
+    int nn=0;
+
+    int Z=6, A=12;
+    double M=0.93827231;
+    double theta[2883]={0}, nu[2883]={0}, xs[2883]={0};
+    double err[2883]={0},E[2883]={0};
+   
+    while(tmp.ReadLine(file)){
+          tmp.Tokenize(content,from," ");
+          tmp.Tokenize(content,from," ");
+          tmp.Tokenize(content,from," ");
+          E[nn]=atof(content.Data());
+          tmp.Tokenize(content,from," ");
+          theta[nn]=atof(content.Data());
+          tmp.Tokenize(content,from," ");
+	if(nn<2525)
+          nu[nn]=atof(content.Data());
+	else{
+	  double xx=atof(content.Data());
+	  double tmpEp = 2.0*M*xx*E[nn]/(4*E[nn]*pow(sin(theta[nn]/180.*Pi()/2.),2)+2.*M*xx);
+	  nu[nn] = E[nn]-tmpEp; 
+	}
+          tmp.Tokenize(content,from," ");
+          xs[nn]=atof(content.Data());
+          tmp.Tokenize(content,from," ");
+	if(nn<2525)
+          err[nn]=atof(content.Data());
+	else{
+	  double stat_err = atof(content.Data());
+	  tmp.Tokenize(content,from," ");
+          double sys_err = atof(content.Data());
+          err[nn]=sqrt(stat_err*stat_err+sys_err*sys_err);
+
+	}
+
+          from=0;
+          nn++;
+     }
+    file.close();
+
+    double hbarc = 197.3269804/1000.;  //GeV*fm
+    double alpha = 1/137.035999084;
+
+    TGraphErrors *gxs_wsq_data=new TGraphErrors();
+    TGraphErrors *gxs_qsq_data=new TGraphErrors();
+    TGraphErrors *gwsq_qsq_data=new TGraphErrors();
+    TGraphErrors *gxs_nu_data=new TGraphErrors();
+
+    TGraphErrors *gxs_wsq_diff=new TGraphErrors();
+    TGraphErrors *gxs_qsq_diff=new TGraphErrors();
+    TGraphErrors *gxs_nu_diff=new TGraphErrors();
+
+    nn=0;
+    for(int ii=0; ii<2883; ii++){
+	double wsq=0, qsq=0;
+	double th=theta[ii]*Pi()/180.;
+	double STH2= pow(sin(th/2.),2);
+	double CTH2= pow(cos(th/2.),2);
+        qsq=4.0*E[ii]*(E[ii]-nu[ii])*STH2;
+ 	wsq=M*M+2*M*nu[ii]-qsq;
+
+	double F1=0, F2=0;
+	F1F2QE09(Z, A, qsq, wsq, F1, F2);	
+
+	double mott=0;
+	mott= pow(alpha*cos(th/2.)/(2*E[ii]*STH2),2);
+        mott= mott*hbarc*hbarc; // fm^2
+
+	double w1=F1/M;
+	double w2=F2/nu[ii];
+
+  	double xs_model = mott*(w2 + 2.0*STH2/CTH2*w1)*1e7;  // nbarn
+
+ 	//if(nu[ii]>4)
+//cout<<ii<<"  "<<theta[ii]<<"  "<<E[ii]<<"  "<<xs[ii]<<"  "<<err[ii]<<"  "<<nu[ii]<<endl;
+//cout<<ii<<"  "<<xs[ii]<<"  "<<xs_model<<"  "<<F1<<"  "<<F2<<"   "<<mott*1e7<<"  "<<xs[ii]/xs_model<<endl;
+//cout<<xs_model<<endl;
+	if(xs_model>0 && qsq<0.06){
+	gxs_wsq_data->SetPoint(nn,wsq,xs[ii]);
+	gxs_wsq_data->SetPointError(nn,0,err[ii]);
+
+	gxs_qsq_data->SetPoint(nn,qsq,xs[ii]);
+	gxs_qsq_data->SetPointError(nn,0,0);
+
+	gwsq_qsq_data->SetPoint(nn,qsq,wsq);
+	gwsq_qsq_data->SetPointError(nn,0,0);
+
+	gxs_nu_data->SetPoint(nn,nu[ii],xs[ii]);
+	gxs_nu_data->SetPointError(nn,0,err[ii]);
+
+	gxs_wsq_diff->SetPoint(nn,wsq,xs[ii]/xs_model);
+	gxs_wsq_diff->SetPointError(nn,0,err[ii]/xs_model);
+
+	gxs_qsq_diff->SetPoint(nn,qsq,xs[ii]/xs_model);
+	gxs_qsq_diff->SetPointError(nn,0,err[ii]/xs_model);
+
+	gxs_nu_diff->SetPoint(nn,nu[ii],xs[ii]/xs_model);
+	gxs_nu_diff->SetPointError(nn,0,err[ii]/xs_model);
+	nn++;
+	}
+    } 
+
+    TCanvas *c1= new TCanvas();
+    c1->Divide(3,2);
+    c1->cd(1);
+    gxs_wsq_data->SetMarkerStyle(8);
+    gxs_wsq_data->Draw("AP");
+    gxs_wsq_data->SetTitle(";wsq;xs;");
+ 
+    c1->cd(2);
+    gxs_qsq_data->SetMarkerStyle(8);
+    gxs_qsq_data->Draw("AP");
+    gxs_qsq_data->SetTitle(";qsq;xs;");
+
+    c1->cd(3);
+    gxs_nu_data->SetMarkerStyle(8);
+    gxs_nu_data->Draw("AP");
+    gxs_nu_data->SetTitle(";nu;xs;");
+
+    c1->cd(4);
+    gxs_wsq_diff->SetMarkerStyle(8);
+    gxs_wsq_diff->Draw("AP");
+    gxs_wsq_diff->SetTitle(";wsq;xs_data/xs_model;");
+
+ 
+    c1->cd(5);
+    gxs_qsq_diff->SetMarkerStyle(8);
+    gxs_qsq_diff->Draw("AP");
+    gxs_qsq_diff->SetTitle(";qsq;xs_data/xs_model;");
+
+    c1->cd(6);
+    gxs_nu_diff->SetMarkerStyle(8);
+    gxs_nu_diff->Draw("AP");
+    gxs_nu_diff->SetTitle(";nu;xs_data/xs_model;");
+
+
+    TCanvas *c2= new TCanvas();
+    gwsq_qsq_data->SetMarkerStyle(8);
+    gwsq_qsq_data->Draw("AP");
+    gwsq_qsq_data->SetTitle(";qsq;wsq;");
+
+
+
+}

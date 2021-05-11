@@ -22,7 +22,7 @@ find_package(Remoll REQUIRED HINTS "${PROJECT_SOURCE_DIR}/../remoll")
 include(${REMOLL_USE_FILE})
 list(APPEND CMAKE_INSTALL_RPATH "${REMOLL_LIBRARY_DIR}")
 
-list(APPEND CMAKE_INSTALL_RPATH "${REMOLL_LIBRARY_DIR}/../remoll")
+#list(APPEND CMAKE_INSTALL_RPATH "${REMOLL_LIBRARY_DIR}/../remoll")
 
 #message(STATUS  "!!! remoll path: ${REMOLL_LIBRARY_DIR}")
 

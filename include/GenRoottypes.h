@@ -14,3 +14,9 @@ struct tgPart{         // particles at the target from the particle gun
    double p;
    int trid;
 };
+
+struct event{         // event physics information
+   double xs;
+   double Q2;
+   double W2;
+};
