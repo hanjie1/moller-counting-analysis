@@ -17,14 +17,16 @@ include(GNUInstallDirs)
 
 list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 
-#message(STATUS  "!!! project path: ${PROJECT_SOURCE_DIR}")
+message(STATUS  "!!! project path: ${PROJECT_SOURCE_DIR}")
+message(STATUS  "!!! project path: ${REMOLL_USE_FILE}")
 find_package(Remoll REQUIRED HINTS "${PROJECT_SOURCE_DIR}/../remoll")
+#find_package(Remoll REQUIRED HINTS "${PROJECT_SOURCE_DIR}/../remoll/cmake/scripts")
 include(${REMOLL_USE_FILE})
 list(APPEND CMAKE_INSTALL_RPATH "${REMOLL_LIBRARY_DIR}")
 
 #list(APPEND CMAKE_INSTALL_RPATH "${REMOLL_LIBRARY_DIR}/../remoll")
 
-#message(STATUS  "!!! remoll path: ${REMOLL_LIBRARY_DIR}")
+message(STATUS  "!!! remoll path: ${REMOLL_LIBRARY_DIR}    ${REMOLL_USE_FILE}")
 
 find_package(ROOT REQUIRED)
 include(${ROOT_USE_FILE})

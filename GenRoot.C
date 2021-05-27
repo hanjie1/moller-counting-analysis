@@ -26,7 +26,7 @@
 #include <TH2D.h>
 
 #include "TTree.h"
-#include "TFile.h"
+
 #include "remolltypes.hh"
 #include "GenRoottypes.h"
 
@@ -50,15 +50,22 @@ bool comparetrid(detHit h1, detHit h2)
 
 int main(){
 
-     TString filename;
+     string filename;
      cout<<"Which root file:     ";
      cin>>filename;
+
+     string rootfile=filename;
+     size_t sfound=rootfile.find("/");
+     if(sfound!=string::npos)
+	rootfile.replace(0,sfound+1,"");
+      
+
      int ismoller=0;
      cout<<"Is it moller scattering?(1=yes, 0=no):  ";
      cin>>ismoller;
 
      TChain *T = new TChain("T");
-     T->AddFile(Form("/home/hanjie/moller/remoll/Rootfiles/%s.root",filename.Data()));
+     T->AddFile(Form("/home/hanjie/moller/remoll/Rootfiles/%s.root",filename.c_str()));
 
      const int ndet = 3;
      int valid_det[ndet] = {60, 30, 28};  // detector I want to be fired: sieve: 60, GEM: 30, MainDetector: 28
@@ -83,7 +90,7 @@ int main(){
      int ntrack;
      double rate;
 
-     TFile *newfile = new TFile(Form("/home/hanjie/moller/optics_analysis/Rootfiles/trackhits_%s.root",filename.Data()),"RECREATE","hits for valid tracks");
+     TFile *newfile = new TFile(Form("/home/hanjie/moller/optics_analysis/Rootfiles/new_fieldmap/trackhits_%s.root",rootfile.c_str()),"RECREATE","hits for valid tracks");
      if(!newfile->IsOpen()) return 0;  
      TTree *newT = new TTree("T","data");
      newT->Branch("sieve", &sieve);
