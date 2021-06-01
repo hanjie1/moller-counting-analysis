@@ -1,22 +1,22 @@
 void PlotKin(){
 
      TChain *Tmoller = new TChain("T");
-     Tmoller->Add("../Rootfiles/new_fieldmap/trackhits_remoll_H1_moller_p5_newfield*");
+     Tmoller->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_H1_moller_p5_newfield*");
 
      TChain *T1 = new TChain("T");
-     T1->Add("../Rootfiles/new_fieldmap/trackhits_remoll_C12_elastic_p1_*");
+     T1->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p1_*");
 
      TChain *T2 = new TChain("T");
-     T2->Add("../Rootfiles/new_fieldmap/trackhits_remoll_C12_elastic_p2_*");
+     T2->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p2_*");
      
      TChain *T3 = new TChain("T");
-     T3->Add("../Rootfiles/new_fieldmap/trackhits_remoll_C12_elastic_p3_*");
+     T3->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p3_*");
 
      TChain *T4 = new TChain("T");
-     T4->Add("../Rootfiles/new_fieldmap/trackhits_remoll_C12_elastic_p4_*");
+     T4->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p4_*");
 
      TChain *T5 = new TChain("T");
-     T5->Add("../Rootfiles/new_fieldmap/trackhits_remoll_C12_elastic_p5_*");
+     T5->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p5_*");
 
      TH2F *hpth_moller = new TH2F("hpth_moller","E' vs. theta moller distribution",100,0.1,1.8,100,0,12);
      TH2F *hpth_p1 = new TH2F("hpth_p1","E' vs. theta elastic pass 1 distribution",100,0.1,1.8,100,0,12);
@@ -25,7 +25,7 @@ void PlotKin(){
      TH2F *hpth_p4 = new TH2F("hpth_p4","E' vs. theta elastic pass 4 distribution",100,0.1,1.8,100,0,12);
      TH2F *hpth_p5 = new TH2F("hpth_p5","E' vs. theta elastic pass 5 distribution",100,0.1,1.8,100,0,12);
 
-     TString COL = "(sieve.r>30)";
+     TString COL = "(sieve.r>25)";
 
      TCanvas *c1 = new TCanvas("c1","c1",1500,1500);
      Tmoller->Draw("tg.p/1000:tg.th/TMath::Pi()*180.>>hpth_moller",Form("rate*%s",COL.Data()));

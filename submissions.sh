@@ -1,0 +1,6 @@
+#!/bin/bash
+qsub submit_job.sh new_fieldmap_new_sieve/remoll_H1_moller_p5_newfield1 1
+qsub submit_job.sh new_fieldmap_new_sieve/remoll_H1_moller_p5_newfield2 1
+qsub submit_job.sh new_fieldmap_new_sieve/remoll_H1_moller_p5_newfield3 1
+qsub submit_job.sh new_fieldmap_new_sieve/remoll_H1_moller_p5_newfield4 1
+qsub submit_job.sh new_fieldmap_new_sieve/remoll_H1_moller_p5_newfield5 1

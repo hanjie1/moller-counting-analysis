@@ -1,21 +1,21 @@
 void PlotRate(){
      TChain *Tmoller = new TChain("T");
-     Tmoller->Add("../Rootfiles/new_fieldmap/trackhits_remoll_H1_moller_p5_newfield*");
+     Tmoller->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_H1_moller_p5_newfield*");
 
      TChain *T1 = new TChain("T");
-     T1->Add("../Rootfiles/new_fieldmap/trackhits_remoll_C12_elastic_p1_*");
+     T1->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p1_*");
 
      TChain *T2 = new TChain("T");
-     T2->Add("../Rootfiles/new_fieldmap/trackhits_remoll_C12_elastic_p2_*");
+     T2->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p2_*");
 
      TChain *T3 = new TChain("T");
-     T3->Add("../Rootfiles/new_fieldmap/trackhits_remoll_C12_elastic_p3_*");
+     T3->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p3_*");
 
      TChain *T4 = new TChain("T");
-     T4->Add("../Rootfiles/new_fieldmap/trackhits_remoll_C12_elastic_p4_*");
+     T4->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p4_*");
 
      TChain *T5 = new TChain("T");
-     T5->Add("../Rootfiles/new_fieldmap/trackhits_remoll_C12_elastic_p5_*");
+     T5->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p5_*");
 
      TH1F *hr_moller = new TH1F("hr_moller","moller events r distribution",400,500,1300);
      TH1F *hr_p1 = new TH1F("hr_p1","elastic p1 events r distribution",400,500,1300);
@@ -24,20 +24,20 @@ void PlotRate(){
      TH1F *hr_p4 = new TH1F("hr_p4","elastic p4 events r distribution",400,500,1300);
      TH1F *hr_p5 = new TH1F("hr_p5","elastic p5 events r distribution",400,500,1300);
 
-     TString CUT1="ring.r>200";
+     TString CUT1="ring.r>300";
 
      TCanvas *c1 = new TCanvas("c1","c1",1500,1500);
      //Tmoller->Draw("ring.r>>hr_moller",Form("rate*(%s)",CUT1.Data()),"HIST");
      //hr_moller->SetLineColor(1);
      
-     T2->Draw("ring.r>>hr_p2",Form("rate*(%s)",CUT1.Data()),"HIST");
+     T1->Draw("ring.r>>hr_p1",Form("rate*(%s)",CUT1.Data()),"HIST");
+     hr_p1->SetLineColor(2);
+     hr_p1->SetLineWidth(2);
+
+     T2->Draw("ring.r>>hr_p2",Form("rate*(%s)",CUT1.Data()),"HIST SAME");
      hr_p2->SetLineColor(4);
      hr_p2->SetLineWidth(2);
      hr_p2->SetTitle("rate vs. ring.r (10uA);ring.r;rate;");
-
-     T1->Draw("ring.r>>hr_p1",Form("rate*(%s)",CUT1.Data()),"HIST SAME");
-     hr_p1->SetLineColor(2);
-     hr_p1->SetLineWidth(2);
 
 
      T3->Draw("ring.r>>hr_p3",Form("rate*(%s)",CUT1.Data()),"HIST SAME");

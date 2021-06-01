@@ -48,11 +48,14 @@ bool comparetrid(detHit h1, detHit h2)
     return (h1.trid < h2.trid); 
 } 
 
-int main(){
+int main(int argc, char** argv){
 
-     string filename;
-     cout<<"Which root file:     ";
-     cin>>filename;
+     if(argc<2){
+	printf("Doesn't have the root file name!\n");
+	return 0;
+     }
+
+     string filename=argv[1];
 
      string rootfile=filename;
      size_t sfound=rootfile.find("/");
@@ -60,15 +63,14 @@ int main(){
 	rootfile.replace(0,sfound+1,"");
       
 
-     int ismoller=0;
-     cout<<"Is it moller scattering?(1=yes, 0=no):  ";
-     cin>>ismoller;
+     int ismoller=0;   // (1=yes, 0=no)
+     ismoller=atoi(argv[2]);
 
      TChain *T = new TChain("T");
      T->AddFile(Form("/home/hanjie/moller/remoll/Rootfiles/%s.root",filename.c_str()));
 
      const int ndet = 3;
-     int valid_det[ndet] = {60, 30, 28};  // detector I want to be fired: sieve: 60, GEM: 30, MainDetector: 28
+     int valid_det[ndet] = {600, 30, 28};  // detector I want to be fired: sieve: 600, GEM: 30, MainDetector: 28
 
      vector < remollGenericDetectorHit_t > *fHit = 0;
      vector < remollEventParticle_t > *fPart = 0;
@@ -90,7 +92,7 @@ int main(){
      int ntrack;
      double rate;
 
-     TFile *newfile = new TFile(Form("/home/hanjie/moller/optics_analysis/Rootfiles/new_fieldmap/trackhits_%s.root",rootfile.c_str()),"RECREATE","hits for valid tracks");
+     TFile *newfile = new TFile(Form("/home/hanjie/moller/optics_analysis/Rootfiles/new_fieldmap_new_sieve/trackhits_%s.root",rootfile.c_str()),"RECREATE","hits for valid tracks");
      if(!newfile->IsOpen()) return 0;  
      TTree *newT = new TTree("T","data");
      newT->Branch("sieve", &sieve);
@@ -212,7 +214,7 @@ int main(){
 
 		 int detid = hit.det;
 		 if(detid==28){ ring.push_back(ahit); nring++;}
-		 if(detid==60){ sieve.push_back(ahit); nsieve++;}
+		 if(detid==600){ sieve.push_back(ahit); nsieve++;}
 		 if(detid==30){
 		    if(ahit.z==19279.5) gem_f1.push_back(ahit);
 		    if(ahit.z==19779.5) gem_f2.push_back(ahit);
