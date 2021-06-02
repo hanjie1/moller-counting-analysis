@@ -33,6 +33,7 @@ void PlotRate(){
      T1->Draw("ring.r>>hr_p1",Form("rate*(%s)",CUT1.Data()),"HIST");
      hr_p1->SetLineColor(2);
      hr_p1->SetLineWidth(2);
+     hr_p1->SetTitle("r at main detector;ring.r;");
 
      T2->Draw("ring.r>>hr_p2",Form("rate*(%s)",CUT1.Data()),"HIST SAME");
      hr_p2->SetLineColor(4);
@@ -82,13 +83,13 @@ void PlotRate(){
     };
 
      c1->Update();
-     TLine *l1_min = new TLine(rMin[0][2],0,rMin[0][2],120e6);
-     TLine *l2_min = new TLine(rMin[1][2],0,rMin[1][2],120e6);
-     TLine *l3_min = new TLine(rMin[2][2],0,rMin[2][2],120e6);
-     TLine *l4_min = new TLine(rMin[3][2],0,rMin[3][2],120e6);
-     TLine *l5_min = new TLine(rMin[4][2],0,rMin[4][2],120e6);
-     TLine *l6_min = new TLine(rMin[5][2],0,rMin[5][2],120e6);
-     TLine *l7_min = new TLine(rMin[6][2],0,rMin[6][2],120e6);
+     TLine *l1_min = new TLine(rMin[0][2],0,rMin[0][2],60e6);
+     TLine *l2_min = new TLine(rMin[1][2],0,rMin[1][2],60e6);
+     TLine *l3_min = new TLine(rMin[2][2],0,rMin[2][2],60e6);
+     TLine *l4_min = new TLine(rMin[3][2],0,rMin[3][2],60e6);
+     TLine *l5_min = new TLine(rMin[4][2],0,rMin[4][2],60e6);
+     TLine *l6_min = new TLine(rMin[5][2],0,rMin[5][2],60e6);
+     TLine *l7_min = new TLine(rMin[6][2],0,rMin[6][2],60e6);
 
      l1_min->SetLineColor(15);
      l1_min->SetLineStyle(9);
