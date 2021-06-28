@@ -19,7 +19,6 @@
 #include <TTree.h>
 #include <TGraph.h>
 #include <TGraphErrors.h>
-#include <TApplication.h>
 /*}}}*/
 using namespace::std;
 using namespace::TMath;
@@ -31,8 +30,7 @@ extern "C"
 }
 
 
-int main(int argc, char **argv){
-    //TApplication theApp("App",&argc,argv,NULL,-1);
+int main(){
     ifstream file;
     file.open("12C.dat");
     
@@ -83,8 +81,6 @@ int main(int argc, char **argv){
     double hbarc = 197.3269804/1000.;  //GeV*fm
     double alpha = 1/137.035999084;
 
-    TFile f("QEplots.root","RECREATE");
-
     TGraphErrors *gxs_wsq_data=new TGraphErrors();
     TGraphErrors *gxs_qsq_data=new TGraphErrors();
     TGraphErrors *gwsq_qsq_data=new TGraphErrors();
@@ -95,7 +91,7 @@ int main(int argc, char **argv){
     TGraphErrors *gxs_nu_diff=new TGraphErrors();
 
     nn=0;
-    for(int ii=0; ii<200; ii++){
+    for(int ii=0; ii<2883; ii++){
 	double wsq=0, qsq=0;
 	double th=theta[ii]*Pi()/180.;
 	double STH2= pow(sin(th/2.),2);
@@ -119,7 +115,7 @@ int main(int argc, char **argv){
 //cout<<ii<<"  "<<theta[ii]<<"  "<<E[ii]<<"  "<<xs[ii]<<"  "<<err[ii]<<"  "<<nu[ii]<<endl;
 //cout<<ii<<"  "<<xs[ii]<<"  "<<xs_model<<"  "<<F1<<"  "<<F2<<"   "<<mott*1e7<<"  "<<xs[ii]/xs_model<<endl;
 //cout<<xs_model<<endl;
-	if(xs_model>0){// && qsq<0.06){
+	if(xs_model>0 && qsq<0.06){
 	gxs_wsq_data->SetPoint(nn,wsq,xs[ii]);
 	gxs_wsq_data->SetPointError(nn,0,err[ii]);
 
@@ -144,65 +140,48 @@ int main(int argc, char **argv){
 	}
     } 
 
-    TCanvas *c1= new TCanvas("c1","c1",1000,800);
+    TCanvas *c1= new TCanvas();
     c1->Divide(3,2);
     c1->cd(1);
     gxs_wsq_data->SetMarkerStyle(8);
     gxs_wsq_data->Draw("AP");
     gxs_wsq_data->SetTitle(";wsq;xs;");
-   // gxs_wsq_data->Write();
  
     c1->cd(2);
     gxs_qsq_data->SetMarkerStyle(8);
     gxs_qsq_data->Draw("AP");
     gxs_qsq_data->SetTitle(";qsq;xs;");
-   // gxs_qsq_data->Write();
 
     c1->cd(3);
     gxs_nu_data->SetMarkerStyle(8);
     gxs_nu_data->Draw("AP");
     gxs_nu_data->SetTitle(";nu;xs;");
-   // gxs_nu_data->Write();
 
     c1->cd(4);
     gxs_wsq_diff->SetMarkerStyle(8);
     gxs_wsq_diff->Draw("AP");
     gxs_wsq_diff->SetTitle(";wsq;xs_data/xs_model;");
-   // gxs_wsq_diff->Write();
 
  
     c1->cd(5);
     gxs_qsq_diff->SetMarkerStyle(8);
     gxs_qsq_diff->Draw("AP");
     gxs_qsq_diff->SetTitle(";qsq;xs_data/xs_model;");
-   // gxs_qsq_diff->Write();
 
     c1->cd(6);
     gxs_nu_diff->SetMarkerStyle(8);
     gxs_nu_diff->Draw("AP");
     gxs_nu_diff->SetTitle(";nu;xs_data/xs_model;");
-   // gxs_nu_diff->Write();
 
-//c1->Modified();
-//c1->Update();
-    c1->Write("c1");
 
-    TCanvas *c2= new TCanvas("c2","c2",1000,800);
+    TCanvas *c2= new TCanvas();
     gwsq_qsq_data->SetMarkerStyle(8);
     gwsq_qsq_data->Draw("AP");
     gwsq_qsq_data->SetTitle(";qsq;wsq;");
-    gwsq_qsq_data->Write();
 
-//c2->Modified();
-//c2->Update();
-    c2->Write("c2");
-
-    f.Write();
-
-    //c1->Print("c1.png");
-    //c2->Print("c2.png");
+    c1->Print("c1.png");
+    c2->Print("c2.png");
 
     return 0;
-    //theApp.Run();
 
 }

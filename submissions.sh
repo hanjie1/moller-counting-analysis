@@ -1,6 +1,6 @@
 #!/bin/bash
-qsub submit_job.sh new_fieldmap_new_sieve/remoll_C12_elastic_p1_test1 0
-qsub submit_job.sh new_fieldmap_new_sieve/remoll_C12_elastic_p1_test2 0
-qsub submit_job.sh new_fieldmap_new_sieve/remoll_C12_elastic_p1_test3 0
-qsub submit_job.sh new_fieldmap_new_sieve/remoll_C12_elastic_p1_test4 0
-qsub submit_job.sh new_fieldmap_new_sieve/remoll_C12_elastic_p1_test5 0
+qsub submit_job.sh new_fieldmap_new_sieve/remoll_C12_inelastic_p3_1 0
+qsub submit_job.sh new_fieldmap_new_sieve/remoll_C12_inelastic_p3_2 0
+qsub submit_job.sh new_fieldmap_new_sieve/remoll_C12_inelastic_p3_3 0
+qsub submit_job.sh new_fieldmap_new_sieve/remoll_C12_inelastic_p3_4 0
+qsub submit_job.sh new_fieldmap_new_sieve/remoll_C12_inelastic_p3_5 0
