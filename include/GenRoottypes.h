@@ -19,4 +19,5 @@ struct event{         // event physics information
    double xs;
    double Q2;
    double W2;
+   double beamp;
 };

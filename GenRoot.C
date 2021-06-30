@@ -119,6 +119,7 @@ int main(int argc, char** argv){
 	 gem_b2.clear();
 	 target.clear();
 	 thisev.xs=0;
+	 thisev.beamp=0;
 	 thisev.W2=0;
 	 thisev.Q2=0;
 
@@ -175,6 +176,7 @@ int main(int argc, char** argv){
  	 thisev.xs=fev->xs;
  	 thisev.Q2=fev->Q2;
  	 thisev.W2=fev->W2;
+ 	 thisev.beamp=fev->beamp;
 
 	 for(int hh =0; hh<ntrk; hh++){
 		remollEventParticle_t  part = fPart->at(hh);	     
