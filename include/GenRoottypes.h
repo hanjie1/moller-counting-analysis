@@ -4,6 +4,7 @@ struct detHit{         // hits at the each detector
    double e, p;
    double r;
    double t;
+   double ph;
    int trid;
 };
 

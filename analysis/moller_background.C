@@ -24,10 +24,12 @@ void moller_background(){
 
 	for(int ii=0; ii<nn; ii++){
 	   TChain *T_el = new TChain("T");
-	   T_el->Add(Form("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p%d_*",kin[ii]));
+	   if(kin[ii]==3)T_el->Add(Form("../Rootfiles/sieve1/trackhits_remoll_C12_elastic_p%d_allSD*",kin[ii]));
+	   else T_el->Add(Form("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p%d_*",kin[ii]));
 
 	   TChain *T_mo = new TChain("T");
-	   T_mo->Add(Form("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_moller_p%d_*",kin[ii]));
+	   if(kin[ii]==3)T_mo->Add(Form("../Rootfiles/sieve1/trackhits_remoll_C12_moller_p%d_*",kin[ii]));
+	   else T_mo->Add(Form("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_moller_p%d_*",kin[ii]));
 
 	   hmo_r[ii]=new TH1F(Form("hmo_r%d",kin[ii]),"moller events r distribution",400,500,1300);
 	   hp_r[ii]=new TH1F(Form("hp_r%d",kin[ii]),"elastic p1 events r distribution",400,500,1300);

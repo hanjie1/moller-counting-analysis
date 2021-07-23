@@ -9,7 +9,7 @@ void PlotRate(){
      T2->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p2_*");
 
      TChain *T3 = new TChain("T");
-     T3->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p3_*");
+     T3->Add("../Rootfiles/sieve1/trackhits_remoll_C12_elastic_p3_*");
 
      TChain *T4 = new TChain("T");
      T4->Add("../Rootfiles/new_fieldmap_new_sieve/trackhits_remoll_C12_elastic_p4_*");

@@ -1,7 +1,7 @@
 void MollerTheoEtheta(){
 	TGraph *gpth[5];
 	double thmax=150;   //deg
-	double thmin=30;   // deg
+	double thmin=15;   // deg
 	double E[5]={11000,8800,6600,4400,2200};   //MeV
 	double me=0.511;  //MeV
 
@@ -38,5 +38,12 @@ void MollerTheoEtheta(){
 	   mg->Add(gpth[ii]);
 	}
 	mg->Draw("AP");
+	mg->SetTitle("moller E' vs. theta;theta(deg);E'(MeV);");
+
+	TLegend *leg=new TLegend(0.5,0.6,0.75,0.8);
+	for(int ii=0; ii<5; ii++)
+	   leg->AddEntry(gpth[ii],Form("pass%d",5-ii),"PL");
+
+	leg->Draw();
 
 }

@@ -92,7 +92,7 @@ int main(int argc, char** argv){
      int ntrack;
      double rate;
 
-     TFile *newfile = new TFile(Form("/home/hanjie/moller/optics_analysis/Rootfiles/new_fieldmap_new_sieve/trackhits_%s.root",rootfile.c_str()),"RECREATE","hits for valid tracks");
+     TFile *newfile = new TFile(Form("/home/hanjie/moller/optics_analysis/Rootfiles/sieve1/trackhits_%s_allSD.root",rootfile.c_str()),"RECREATE","hits for valid tracks");
      if(!newfile->IsOpen()) return 0;  
      TTree *newT = new TTree("T","data");
      newT->Branch("sieve", &sieve);
@@ -124,6 +124,7 @@ int main(int argc, char** argv){
 	 thisev.Q2=0;
 
 	 ntrack=0;
+	 rate=0;
  
         const int ntrk=ismoller+1;      // number of tracks that we care about
 
@@ -213,6 +214,7 @@ int main(int argc, char** argv){
 		 ahit.py = hit.py;
 		 ahit.pz = hit.pz;
 		 ahit.t = hit.t;
+		 ahit.ph=hit.ph;
 
 		 int detid = hit.det;
 		 if(detid==28){ ring.push_back(ahit); nring++;}
