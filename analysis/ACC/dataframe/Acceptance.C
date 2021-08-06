@@ -116,29 +116,19 @@ void Acceptance(){
    stpw->Start();
 
    // acceptance plots
-   
-   for(int ii=0; ii<6; ii++){
-    for(int jj=0; jj<7; jj++){
-     for(int kk=0; kk<4; kk++){
-	tgth_acc[ii][jj][kk] = (TH1D *)tgth_main[ii][jj][kk].GetPtr()->Clone();
-	tgth_acc[ii][jj][kk]->Divide(tgth_in.GetPtr());	
+   PlotSecACC( tgth_in, tgth_main, "th");
 
-	tgph_acc[ii][jj][kk] = (TH1D *)tgph_main[ii][jj][kk].GetPtr()->Clone();
-	tgph_acc[ii][jj][kk]->Divide(tgph_in.GetPtr());	
+  std::cout <<"3:  "<< stpw->RealTime() << std::endl;
+  stpw->Start();
 
-	tgp_acc[ii][jj][kk] = (TH1D *)tgp_main[ii][jj][kk].GetPtr()->Clone();
-	tgp_acc[ii][jj][kk]->Divide(tgp_in.GetPtr());	
+   PlotSecACC( tgph_in, tgph_main, "ph");
 
-	tg_thph_acc[ii][jj][kk] = (TH2D *)tg_thph_main[ii][jj][kk].GetPtr()->Clone();
-	tg_thph_acc[ii][jj][kk]->Divide(tg_thph_in.GetPtr());	
+  std::cout <<"4:  "<< stpw->RealTime() << std::endl;
+  stpw->Start();
 
-	tg_thp_acc[ii][jj][kk] = (TH2D *)tg_thp_main[ii][jj][kk].GetPtr()->Clone();
-	tg_thp_acc[ii][jj][kk]->Divide(tg_thp_in.GetPtr());	
-     }
-    }
-   } 
+   PlotSecACC( tgp_in, tgp_main, "p");
 
-   // merge different sections' acceptance together for each ring
+  std::cout <<"5:  "<< stpw->RealTime() << std::endl;
 /*
    TH1D *tgth_acc_r[6];
    TH1D *tgph_acc_r[6];
@@ -158,7 +148,7 @@ void Acceptance(){
   h->Draw();
    
    for
-*/
+
    std::cout <<"3:  "<< stpw->RealTime() << std::endl;
    stpw->Start();
 
@@ -181,8 +171,7 @@ void Acceptance(){
    }
 
    c1->Print("plots/accep.pdf[");
-
-  std::cout <<"4:  "<< stpw->RealTime() << std::endl;
+*/
 
 
 }
