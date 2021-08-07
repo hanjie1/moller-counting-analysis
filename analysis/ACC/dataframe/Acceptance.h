@@ -16,9 +16,9 @@ void SetXYPhi(){
 	  ph[jj][kk]=tmp_ph;
 	  xx[ii][jj][kk]=tmpr*cos(tmp_ph);
 	  yy[ii][jj][kk]=tmpr*sin(tmp_ph);
-//cout<<ph[jj][kk]<<"  ";
+//if(ii==0)cout<<ph[jj][kk]<<"  ";
 	}
-//cout<<endl;
+//if(ii==0)cout<<endl;
       }
     } 
     return;
@@ -101,10 +101,10 @@ void PlotSecACC( ROOT::RDF::RResultPtr<TH1D> h1d_in, ROOT::RDF::RResultPtr<TH1D>
         tex.DrawLatexNDC(.2,.75,Form("Neff=%d",nevent_eff));
       }
      }
-     c1->Print(Form("plots/sec_acc_r%d_%s.pdf[",ii+1,filename.Data()));
-     c1->Print(Form("plots/sec_acc_r%d_%s.pdf",ii+1,filename.Data()));
-     c2->Print(Form("plots/sec_acc_r%d_%s.pdf",ii+1,filename.Data()));
-     c2->Print(Form("plots/sec_acc_r%d_%s.pdf]",ii+1,filename.Data()));
+     c1->Print(Form("plots/moller_sec_acc_r%d_%s.pdf[",ii+1,filename.Data()));
+     c1->Print(Form("plots/moller_sec_acc_r%d_%s.pdf",ii+1,filename.Data()));
+     c2->Print(Form("plots/moller_sec_acc_r%d_%s.pdf",ii+1,filename.Data()));
+     c2->Print(Form("plots/moller_sec_acc_r%d_%s.pdf]",ii+1,filename.Data()));
   
      delete c1;
      delete c2; 
@@ -112,3 +112,182 @@ void PlotSecACC( ROOT::RDF::RResultPtr<TH1D> h1d_in, ROOT::RDF::RResultPtr<TH1D>
 
    return;
 }
+
+void PlotRingACC( ROOT::RDF::RResultPtr<TH1D> h1d_in, ROOT::RDF::RResultPtr<TH1D> h1d_main[6][7][4], TString filename){
+   TH1D *hacc_r[6];
+   TH1D *hacc_total;
+   TH1D *hmain_r[6];
+   TH1D *hmain_total;
+   
+   TList *list = new TList;
+   for(int ii=0; ii<6; ii++){
+
+      TList *list_r = new TList;
+
+      for(int jj=0; jj<7; jj++){
+         for(int kk=0; kk<4; kk++){
+
+	    list->Add(h1d_main[ii][jj][kk].GetPtr());	
+	    list_r->Add(h1d_main[ii][jj][kk].GetPtr());	
+         }
+      }
+
+      hmain_r[ii]=(TH1D *)h1d_main[ii][0][0].GetPtr()->Clone(Form("hmain_r%d",ii+1));
+      hmain_r[ii]->Reset();
+      hmain_r[ii]->Merge(list_r); 
+
+      hacc_r[ii]=(TH1D *)hmain_r[ii]->Clone(Form("hacc_r%d",ii+1));
+      hacc_r[ii]->Divide(h1d_in.GetPtr());
+      delete list_r;
+   }
+
+   hmain_total=(TH1D *)h1d_main[0][0][0].GetPtr()->Clone("hmain_total");
+   hmain_total->Reset();
+   hmain_total->Merge(list); 
+
+   hacc_total=(TH1D *)hmain_total->Clone("hacc_total");
+   hacc_total->Divide(h1d_in.GetPtr());
+
+   gStyle->SetOptStat(111101);
+
+   TCanvas *c1= new TCanvas("c1");
+   c1->Divide(3,2);
+   for(int ii=0; ii<6; ii++){
+       c1->cd(ii+1);
+       hacc_r[ii]->Draw("hist");
+       hacc_r[ii]->SetTitle(Form("r%d;%s;acc;",ii+1,filename.Data()));
+
+       Int_t nevent = hmain_r[ii]->GetEntries();
+       Int_t nevent_eff = hmain_r[ii]->GetEffectiveEntries();
+
+       TLatex tex;
+       tex.SetTextSize(0.025);
+       tex.DrawLatexNDC(.2,.8,Form("N=%d",nevent));
+       tex.DrawLatexNDC(.2,.75,Form("Neff=%d",nevent_eff));
+   } 
+
+   TCanvas *c2= new TCanvas("c2");
+   hacc_total->Draw("hist");
+   hacc_total->SetTitle(Form("%s acceptance;%s;acc;",filename.Data(),filename.Data())); 
+
+   Int_t nevent = hmain_total->GetEntries();
+   Int_t nevent_eff = hmain_total->GetEffectiveEntries();
+
+   TLatex tex;
+   tex.SetTextSize(0.025);
+   tex.DrawLatexNDC(.2,.8,Form("N=%d",nevent));
+   tex.DrawLatexNDC(.2,.75,Form("Neff=%d",nevent_eff));
+
+   c1->Print(Form("plots/moller_ring_acc_%s.pdf[",filename.Data()));
+   c1->Print(Form("plots/moller_ring_acc_%s.pdf",filename.Data()));
+   c2->Print(Form("plots/moller_ring_acc_%s.pdf",filename.Data()));
+   c2->Print(Form("plots/moller_ring_acc_%s.pdf]",filename.Data()));
+
+   return;
+}     
+
+void PlotSecAcc2D(ROOT::RDF::RResultPtr<TH2D> h2d_in, ROOT::RDF::RResultPtr<TH2D> h2d_main[6][7][4], TString xname, TString yname){
+   TH2D *h2d_acc[6][7][4];
+
+   for(int ii=0; ii<6; ii++){
+    for(int jj=0; jj<7; jj++){
+     for(int kk=0; kk<4; kk++){
+        h2d_acc[ii][jj][kk] = (TH2D *)h2d_main[ii][jj][kk].GetPtr()->Clone();
+        h2d_acc[ii][jj][kk]->Divide(h2d_in.GetPtr());
+     }
+    }
+   }
+
+   gStyle->SetOptStat(0);
+   
+   for(int ii=0; ii<6; ii++){
+     TCanvas *c1=new TCanvas("c1");
+     c1->Divide(4,4);
+     for(int jj=0; jj<4; jj++){  // sec
+      for(int kk=0; kk<4; kk++){  // part
+	c1->cd(jj*4+kk+1);
+	h2d_acc[ii][jj][kk]->Draw("colz");
+	h2d_acc[ii][jj][kk]->SetTitle(Form("acc_r%ds%dp%d;%s;%s;",ii+1,jj+1,kk+1,xname.Data(),yname.Data()));
+      }
+     }
+ 
+     TCanvas *c2=new TCanvas("c2");
+     c2->Divide(4,3);
+     for(int jj=4; jj<7; jj++){  // sec
+      for(int kk=0; kk<4; kk++){  // part
+	c2->cd((jj-4)*4+kk+1);
+	h2d_acc[ii][jj][kk]->Draw("colz");
+	h2d_acc[ii][jj][kk]->SetTitle(Form("acc_r%ds%dp%d;%s;%s;",ii+1,jj+1,kk+1,xname.Data(),yname.Data()));
+      }
+     }
+
+     c1->Print(Form("plots/moller_sec_acc2d_r%d_%s_%s.pdf[",ii+1,xname.Data(),yname.Data()));
+     c1->Print(Form("plots/moller_sec_acc2d_r%d_%s_%s.pdf",ii+1,xname.Data(),yname.Data()));
+     c2->Print(Form("plots/moller_sec_acc2d_r%d_%s_%s.pdf",ii+1,xname.Data(),yname.Data()));
+     c2->Print(Form("plots/moller_sec_acc2d_r%d_%s_%s.pdf]",ii+1,xname.Data(),yname.Data()));
+  
+     delete c1;
+     delete c2; 
+   }
+
+   return;
+}
+
+
+void PlotRingAcc2D( ROOT::RDF::RResultPtr<TH2D> h2d_in, ROOT::RDF::RResultPtr<TH2D> h2d_main[6][7][4], TString xname, TString yname){
+   TH2D *hacc_r[6];
+   TH2D *hacc_total;
+   TH2D *hmain_r[6];
+   TH2D *hmain_total;
+   
+   TList *list = new TList;
+   for(int ii=0; ii<6; ii++){
+
+      TList *list_r = new TList;
+
+      for(int jj=0; jj<7; jj++){
+         for(int kk=0; kk<4; kk++){
+
+	    list->Add(h2d_main[ii][jj][kk].GetPtr());	
+	    list_r->Add(h2d_main[ii][jj][kk].GetPtr());	
+         }
+      }
+
+      hmain_r[ii]=(TH2D *)h2d_main[ii][0][0].GetPtr()->Clone(Form("hmain_r%d",ii+1));
+      hmain_r[ii]->Reset();
+      hmain_r[ii]->Merge(list_r); 
+
+      hacc_r[ii]=(TH2D *)hmain_r[ii]->Clone(Form("hacc_r%d",ii+1));
+      hacc_r[ii]->Divide(h2d_in.GetPtr());
+      delete list_r;
+   }
+
+   hmain_total=(TH2D *)h2d_main[0][0][0].GetPtr()->Clone("hmain_total");
+   hmain_total->Reset();
+   hmain_total->Merge(list); 
+
+   hacc_total=(TH2D *)hmain_total->Clone("hacc_total");
+   hacc_total->Divide(h2d_in.GetPtr());
+
+   gStyle->SetOptStat(0);
+
+   TCanvas *c1= new TCanvas("c1");
+   c1->Divide(3,2);
+   for(int ii=0; ii<6; ii++){
+       c1->cd(ii+1);
+       hacc_r[ii]->Draw("colz");
+       hacc_r[ii]->SetTitle(Form("r%d %s vs %s;%s;%s;",ii+1,yname.Data(),xname.Data(),xname.Data(),yname.Data()));
+   } 
+
+   TCanvas *c2= new TCanvas("c2");
+   hacc_total->Draw("colz");
+   hacc_total->SetTitle(Form("%s vs %s acceptance;%s;%s;",yname.Data(),xname.Data(),xname.Data(),yname.Data())); 
+
+   c1->Print(Form("plots/moller_ring_acc2d_%s_%s.pdf[",xname.Data(),yname.Data()));
+   c1->Print(Form("plots/moller_ring_acc2d_%s_%s.pdf",xname.Data(),yname.Data()));
+   c2->Print(Form("plots/moller_ring_acc2d_%s_%s.pdf",xname.Data(),yname.Data()));
+   c2->Print(Form("plots/moller_ring_acc2d_%s_%s.pdf]",xname.Data(),yname.Data()));
+
+   return;
+}     
+

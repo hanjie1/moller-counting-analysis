@@ -8,7 +8,7 @@ void Acceptance(){
    bool check_twohits=false;
 
    ROOT::EnableImplicitMT();
-   auto fileName = "/w/halla-scifs17exp/moller12gev/hanjie/remoll/rootfiles/remoll_H1_moller_p5_newfield1.root";
+   auto fileName = "/w/halla-scifs17exp/moller12gev/hanjie/remoll/rootfiles/remoll_H1_moller_p5_newfield*";
    auto treeName = "T";
  
    ROOT::RDataFrame d(treeName, fileName);
@@ -52,16 +52,17 @@ void Acceptance(){
 
    ROOT::RDF::RResultPtr<TH2D> tg_thph_in;
    ROOT::RDF::RResultPtr<TH2D> tg_thph_main[6][7][4];
-   TH2D *tg_thph_acc[6][7][4];
 
    ROOT::RDF::RResultPtr<TH2D> tg_thp_in;
    ROOT::RDF::RResultPtr<TH2D> tg_thp_main[6][7][4];
-   TH2D *tg_thp_acc[6][7][4];
 
+   auto tg_cuts_moller="part.p[0]>1000 && part.p[1]>1000";
+   auto tg_cuts_ep="part.p>1000";
+   auto tg_df = d.Filter(tg_cuts_moller);
 
-   tgth_in = d.Histo1D<Double_t>({"tgth_in","tgth_in",50,0,0.024},"part.th","rate");
-   tgph_in = d.Histo1D<Double_t>({"tgph_in","tgph_in",50,-Pi(),Pi()},"part.ph","rate");
-   tgp_in = d.Histo1D<Double_t>({"tgp_in","tgp_in",50,0,11000},"part.p","rate");
+   tgth_in = tg_df.Histo1D<Double_t>({"tgth_in","tgth_in",50,0,0.024},"part.th","rate");
+   tgph_in = tg_df.Histo1D<Double_t>({"tgph_in","tgph_in",50,-Pi(),Pi()},"part.ph","rate");
+   tgp_in = tg_df.Histo1D<Double_t>({"tgp_in","tgp_in",50,0,11000},"part.p","rate");
 
    tg_thph_in = d.Histo2D<Double_t>({"tg_thph_in","tg_thph_in",50,0,0.024,50,-Pi(),Pi()},"part.th","part.ph","rate");
    tg_thp_in = d.Histo2D<Double_t>({"tg_thp_in","tg_thp_in",50,0,0.024,50,0,11000},"part.th","part.p","rate");
@@ -71,9 +72,9 @@ void Acceptance(){
      for(int kk=0; kk<4; kk++){
 	TString cuts;
         if(jj==3 && kk==2) 
-	   cuts = Form("(main_r>%f && main_r<%f) && ((main_ph>%f && main_ph<%f) || (main_ph>%f && main_ph<%f))",r[ii],r[ii+1],ph[jj][kk],Pi(),-Pi(),ph[jj][kk+1]);
+	   cuts = Form("(main_r>%f && main_r<%f) && ((main_ph>%f && main_ph<=%f) || (main_ph>=%f && main_ph<=%f))",r[ii],r[ii+1],ph[jj][kk],Pi(),-Pi(),ph[jj][kk+1]);
 	else 
-  	   cuts = Form("(main_r>%f && main_r<%f) && (main_ph>%f && main_ph<%f)",r[ii],r[ii+1],ph[jj][kk],ph[jj][kk+1]); 
+  	   cuts = Form("(main_r>%f && main_r<%f) && (main_ph>%f && main_ph<=%f)",r[ii],r[ii+1],ph[jj][kk],ph[jj][kk+1]); 
 
 	auto sec_df = newdf.Filter(cuts.Data());
 
@@ -116,62 +117,36 @@ void Acceptance(){
    stpw->Start();
 
    // acceptance plots
-   PlotSecACC( tgth_in, tgth_main, "th");
+ 
+   // sector
 
-  std::cout <<"3:  "<< stpw->RealTime() << std::endl;
-  stpw->Start();
+   PlotSecACC( tgth_in, tgth_main, "tgth");
+   PlotSecACC( tgph_in, tgph_main, "tgph");
+   PlotSecACC( tgp_in, tgp_main, "tgp");
 
-   PlotSecACC( tgph_in, tgph_main, "ph");
+//   std::cout <<"3:  "<< stpw->RealTime() << std::endl;
+//   stpw->Start();
 
-  std::cout <<"4:  "<< stpw->RealTime() << std::endl;
-  stpw->Start();
+   // ring
 
-   PlotSecACC( tgp_in, tgp_main, "p");
+   PlotRingACC(tgth_in, tgth_main, "tgth"); 
+   PlotRingACC(tgph_in, tgph_main, "tgph"); 
+   PlotRingACC(tgp_in, tgp_main, "tgp"); 
 
-  std::cout <<"5:  "<< stpw->RealTime() << std::endl;
-/*
-   TH1D *tgth_acc_r[6];
-   TH1D *tgph_acc_r[6];
-   TH1D *tgp_acc_r[6];
-   
-   TH2D *tgthph_acc_r[6];
-   TH2D *tgthp_acc_r[6];
+//   std::cout <<"4:  "<< stpw->RealTime() << std::endl;
+//   stpw->Start();
 
-   TList *list = new TList;
+   // sector 2d
 
-  list->Add(h1);
-  list->Add(h2);
-  list->Add(h3);
-  TH1F *h = (TH1F*)h1->Clone("h");
-  h->Reset();
-  h->Merge(list);
-  h->Draw();
-   
-   for
+   PlotSecAcc2D(tg_thph_in, tg_thph_main, "tgth", "tgph");
+   PlotSecAcc2D(tg_thp_in, tg_thp_main, "tgth", "tgp");
 
-   std::cout <<"3:  "<< stpw->RealTime() << std::endl;
-   stpw->Start();
+   PlotRingAcc2D(tg_thph_in, tg_thph_main, "tgth", "tgph");
+   PlotRingAcc2D(tg_thp_in, tg_thp_main, "tgth", "tgp");
 
-   gStyle->SetOptStat(111101);
 
-   TCanvas *c1 = new TCanvas();
-   c1->Divide(4,3);
-   for(int ii=0; ii<4; ii++){
-	c1->cd(ii+1);
-        tgth_acc[5][0][ii]->Draw("hist");
-   }
 
-   for(int ii=0; ii<4; ii++){
-	c1->cd(ii+5);
-        tgph_acc[5][0][ii]->Draw("hist");
-   }
-   for(int ii=0; ii<4; ii++){
-	c1->cd(ii+9);
-        tgp_acc[5][0][ii]->Draw("hist");
-   }
-
-   c1->Print("plots/accep.pdf[");
-*/
+   std::cout <<"5:  "<< stpw->RealTime() << std::endl;
 
 
 }
