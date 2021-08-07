@@ -1,10 +1,14 @@
 using RNode = ROOT::RDF::RNode;
 using namespace TMath;
 
+bool ismoller=false;
+int pass=3;
+
 double r[7]={650,690,735,790,900,1060,1160};     // radius for the 6 rings
 double ph[7][5];
 double xx[7][7][5];   // x[ring][sec][C,T,O,T]
 double yy[7][7][5];
+
 
 void SetXYPhi(){
     for(int ii=0; ii<7; ii++){  // ring loop
@@ -25,11 +29,20 @@ void SetXYPhi(){
 } 
 
 void GenSmallRootfile(RNode df,std::string_view rootname){
+if(ismoller){
   auto df_small = df.Define("main_r","hit.r[maindet_hit][0]").Define("main_ph","hit.ph[maindet_hit][0]").Define("main_x","hit.x[maindet_hit][0]").Define("main_y","hit.y[maindet_hit][0]")
 		    .Define("main_p","hit.p[maindet_hit][0]")
      		    .Define("tg_th","trid[0]==1?part.th[0]:part.th[1]").Define("tg_ph","trid[0]==1?part.ph[0]:part.ph[1]").Define("tg_p","trid[0]==1?part.p[0]:part.p[1]");
 
   df_small.Snapshot("T",rootname,{"main_r","main_ph","main_x","main_y","main_p","tg_th","tg_ph","tg_p","rate"}); 
+}
+else{
+  auto df_small = df.Define("main_r","hit.r[maindet_hit][0]").Define("main_ph","hit.ph[maindet_hit][0]").Define("main_x","hit.x[maindet_hit][0]").Define("main_y","hit.y[maindet_hit][0]")
+		    .Define("main_p","hit.p[maindet_hit][0]")
+     		    .Define("tg_th","part.th[0]").Define("tg_ph","part.ph[0]").Define("tg_p","part.p[0]");
+
+  df_small.Snapshot("T",rootname,{"main_r","main_ph","main_x","main_y","main_p","tg_th","tg_ph","tg_p","rate"}); 
+}
   return;
 }
 
@@ -101,10 +114,17 @@ void PlotSecACC( ROOT::RDF::RResultPtr<TH1D> h1d_in, ROOT::RDF::RResultPtr<TH1D>
         tex.DrawLatexNDC(.2,.75,Form("Neff=%d",nevent_eff));
       }
      }
-     c1->Print(Form("plots/moller_sec_acc_r%d_%s.pdf[",ii+1,filename.Data()));
-     c1->Print(Form("plots/moller_sec_acc_r%d_%s.pdf",ii+1,filename.Data()));
-     c2->Print(Form("plots/moller_sec_acc_r%d_%s.pdf",ii+1,filename.Data()));
-     c2->Print(Form("plots/moller_sec_acc_r%d_%s.pdf]",ii+1,filename.Data()));
+
+     TString pdfname;
+     if(ismoller)
+        pdfname=Form("plots/moller_%d_sec_acc_r%d_%s.pdf",pass,ii+1,filename.Data());
+     else 
+        pdfname=Form("plots/C12el_%d_sec_acc_r%d_%s.pdf",pass,ii+1,filename.Data());
+
+     c1->Print(Form("%s[",pdfname.Data()));
+     c1->Print(pdfname);
+     c2->Print(pdfname);
+     c2->Print(Form("%s]",pdfname.Data()));
   
      delete c1;
      delete c2; 
@@ -178,10 +198,16 @@ void PlotRingACC( ROOT::RDF::RResultPtr<TH1D> h1d_in, ROOT::RDF::RResultPtr<TH1D
    tex.DrawLatexNDC(.2,.8,Form("N=%d",nevent));
    tex.DrawLatexNDC(.2,.75,Form("Neff=%d",nevent_eff));
 
-   c1->Print(Form("plots/moller_ring_acc_%s.pdf[",filename.Data()));
-   c1->Print(Form("plots/moller_ring_acc_%s.pdf",filename.Data()));
-   c2->Print(Form("plots/moller_ring_acc_%s.pdf",filename.Data()));
-   c2->Print(Form("plots/moller_ring_acc_%s.pdf]",filename.Data()));
+   TString pdfname;
+   if(ismoller)
+      pdfname=Form("plots/moller_%d_ring_acc_%s.pdf",pass,filename.Data());
+   else 
+      pdfname=Form("plots/C12el_%d_ring_acc_%s.pdf",pass,filename.Data());
+
+     c1->Print(Form("%s[",pdfname.Data()));
+     c1->Print(pdfname);
+     c2->Print(pdfname);
+     c2->Print(Form("%s]",pdfname.Data()));
 
    return;
 }     
@@ -221,10 +247,16 @@ void PlotSecAcc2D(ROOT::RDF::RResultPtr<TH2D> h2d_in, ROOT::RDF::RResultPtr<TH2D
       }
      }
 
-     c1->Print(Form("plots/moller_sec_acc2d_r%d_%s_%s.pdf[",ii+1,xname.Data(),yname.Data()));
-     c1->Print(Form("plots/moller_sec_acc2d_r%d_%s_%s.pdf",ii+1,xname.Data(),yname.Data()));
-     c2->Print(Form("plots/moller_sec_acc2d_r%d_%s_%s.pdf",ii+1,xname.Data(),yname.Data()));
-     c2->Print(Form("plots/moller_sec_acc2d_r%d_%s_%s.pdf]",ii+1,xname.Data(),yname.Data()));
+     TString pdfname;
+     if(ismoller)
+        pdfname=Form("plots/moller_%d_sec_acc2d_r%d_%s_%s.pdf",pass,ii+1,xname.Data(),yname.Data());
+     else 
+        pdfname=Form("plots/C12el_%d_sec_acc2d_r%d_%s_%s.pdf",pass,ii+1,xname.Data(),yname.Data());
+
+     c1->Print(Form("%s[",pdfname.Data()));
+     c1->Print(pdfname);
+     c2->Print(pdfname);
+     c2->Print(Form("%s]",pdfname.Data()));
   
      delete c1;
      delete c2; 
@@ -283,10 +315,16 @@ void PlotRingAcc2D( ROOT::RDF::RResultPtr<TH2D> h2d_in, ROOT::RDF::RResultPtr<TH
    hacc_total->Draw("colz");
    hacc_total->SetTitle(Form("%s vs %s acceptance;%s;%s;",yname.Data(),xname.Data(),xname.Data(),yname.Data())); 
 
-   c1->Print(Form("plots/moller_ring_acc2d_%s_%s.pdf[",xname.Data(),yname.Data()));
-   c1->Print(Form("plots/moller_ring_acc2d_%s_%s.pdf",xname.Data(),yname.Data()));
-   c2->Print(Form("plots/moller_ring_acc2d_%s_%s.pdf",xname.Data(),yname.Data()));
-   c2->Print(Form("plots/moller_ring_acc2d_%s_%s.pdf]",xname.Data(),yname.Data()));
+   TString pdfname;
+   if(ismoller)
+      pdfname=Form("plots/moller_%d_ring_acc2d_%s_%s.pdf",pass,xname.Data(),yname.Data());
+   else 
+      pdfname=Form("plots/C12el_%d_ring_acc2d_%s_%s.pdf",pass,xname.Data(),yname.Data());
+
+   c1->Print(Form("%s[",pdfname.Data()));
+   c1->Print(pdfname);
+   c2->Print(pdfname);
+   c2->Print(Form("%s]",pdfname.Data()));
 
    return;
 }     

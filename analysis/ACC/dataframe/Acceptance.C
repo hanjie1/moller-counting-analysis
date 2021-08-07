@@ -8,23 +8,36 @@ void Acceptance(){
    bool check_twohits=false;
 
    ROOT::EnableImplicitMT();
-   auto fileName = "/w/halla-scifs17exp/moller12gev/hanjie/remoll/rootfiles/remoll_H1_moller_p5_newfield*";
+   auto fileName = Form("/w/halla-scifs17exp/moller12gev/hanjie/remoll/rootfiles/remoll_C12_elastic_p%dtest*",pass);
    auto treeName = "T";
  
    ROOT::RDataFrame d(treeName, fileName);
 
    // cuts
-   auto main_el="hit.det==28 && hit.pid==11 && hit.mtrid==0 && hit.trid==1";   // elastic primary events at main detector
-   auto main_moller="hit.det==28 && hit.pid==11 && hit.mtrid==0 && (hit.trid==1 || hit.trid==2)";   // moller primary events at maine detector
+   std::string_view main_el; 
+   if(ismoller)
+       main_el="hit.det==28 && hit.pid==11 && hit.mtrid==0 && (hit.trid==1 || hit.trid==2)";   // moller primary events at maine detector
+   else
+       main_el="hit.det==28 && hit.pid==11 && hit.mtrid==0 && hit.trid==1";   // elastic primary events at main detector
 
    // apply cuts and generate new columns
-   auto selected_d = d.Define("maindet_hit",main_moller).Define("good_hit","Sum(maindet_hit)").Define("trid","hit.trid[maindet_hit]").Filter("good_hit>0");
+   auto selected_d = d.Define("maindet_hit",main_el).Define("good_hit","Sum(maindet_hit)").Define("trid","hit.trid[maindet_hit]").Filter("good_hit>0");
+   std::cout <<"1:  "<< stpw->RealTime() << std::endl;
+   stpw->Start();
 
    // generate small root file for one hit events
    auto onehit_d = selected_d.Filter("good_hit==1");
 
-   GenSmallRootfile(onehit_d,"small.root");
-   ROOT::RDataFrame newdf("T","small.root");
+   std::string_view rootname;
+   if(ismoller) rootname=Form("moller_small_p%d.root",pass);
+   else rootname=Form("C12el_small_p%d.root",pass);
+   
+   GenSmallRootfile(onehit_d,rootname);
+
+   std::cout <<"11:  "<< stpw->RealTime() << std::endl;
+   stpw->Start();
+
+   ROOT::RDataFrame newdf("T",rootname);
    
    //auto d1=newdf.Display();
    //d1->Print();
@@ -34,9 +47,6 @@ void Acceptance(){
 
    // make plots
    SetXYPhi();
-
-   std::cout <<"1:  "<< stpw->RealTime() << std::endl;
-   stpw->Start();
 
    ROOT::RDF::RResultPtr<TH1D> tgth_in;
    ROOT::RDF::RResultPtr<TH1D> tgth_main[6][7][4];
@@ -56,9 +66,11 @@ void Acceptance(){
    ROOT::RDF::RResultPtr<TH2D> tg_thp_in;
    ROOT::RDF::RResultPtr<TH2D> tg_thp_main[6][7][4];
 
-   auto tg_cuts_moller="part.p[0]>1000 && part.p[1]>1000";
-   auto tg_cuts_ep="part.p>1000";
-   auto tg_df = d.Filter(tg_cuts_moller);
+   TString tg_cuts;
+   if(ismoller) tg_cuts="part.p[0]>1000 && part.p[1]>1000";
+   else tg_cuts="part.p[0]>1000";
+
+   auto tg_df = d.Filter(tg_cuts.Data());
 
    tgth_in = tg_df.Histo1D<Double_t>({"tgth_in","tgth_in",50,0,0.024},"part.th","rate");
    tgph_in = tg_df.Histo1D<Double_t>({"tgph_in","tgph_in",50,-Pi(),Pi()},"part.ph","rate");
@@ -66,6 +78,9 @@ void Acceptance(){
 
    tg_thph_in = d.Histo2D<Double_t>({"tg_thph_in","tg_thph_in",50,0,0.024,50,-Pi(),Pi()},"part.th","part.ph","rate");
    tg_thp_in = d.Histo2D<Double_t>({"tg_thp_in","tg_thp_in",50,0,0.024,50,0,11000},"part.th","part.p","rate");
+
+   std::cout <<"12:  "<< stpw->RealTime() << std::endl;
+   stpw->Start();
 
    for(int ii=0; ii<6; ii++){
     for(int jj=0; jj<7; jj++){
@@ -124,8 +139,8 @@ void Acceptance(){
    PlotSecACC( tgph_in, tgph_main, "tgph");
    PlotSecACC( tgp_in, tgp_main, "tgp");
 
-//   std::cout <<"3:  "<< stpw->RealTime() << std::endl;
-//   stpw->Start();
+   std::cout <<"3:  "<< stpw->RealTime() << std::endl;
+   stpw->Start();
 
    // ring
 
@@ -133,8 +148,8 @@ void Acceptance(){
    PlotRingACC(tgph_in, tgph_main, "tgph"); 
    PlotRingACC(tgp_in, tgp_main, "tgp"); 
 
-//   std::cout <<"4:  "<< stpw->RealTime() << std::endl;
-//   stpw->Start();
+   std::cout <<"4:  "<< stpw->RealTime() << std::endl;
+   stpw->Start();
 
    // sector 2d
 
