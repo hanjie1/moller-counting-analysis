@@ -50,21 +50,39 @@ void MainDis(){
    sieve_xy = cutdf1.Histo2D<Double_t>({"sieve_xy","y vs. x at sieve",200,-120,120,200,-120,120},"sieve_x","sieve_y","rate");
 
    for(int ii=0; ii<7; ii++){
+        double ph_lo, ph_hi;
+ 	if(ii==6){
+	   ph_lo=ph_1[ii];
+	   ph_hi=ph_1[0];
+	}
+	else if(ii==3){
+	   ph_lo=ph_1[ii];
+	   ph_hi=ph_1[ii+1]+2*Pi();
+
+	}
+	else{
+	   ph_lo=ph_1[ii];
+	   ph_hi=ph_1[ii+1];
+	}
+
         TString cuts;
         if(ii==3)
            cuts = Form("(main_ph>%f && main_ph<=%f) || (main_ph>=%f && main_ph<=%f)",ph_1[ii],Pi(),-Pi(),ph_1[ii+1]);
-        else if(ii==6)
-           cuts = Form("main_ph>%f && main_ph<=%f",ph_1[ii],ph_1[0]);
-	else
-           cuts = Form("main_ph>%f && main_ph<=%f",ph_1[ii],ph_1[ii+1]);
+        else
+           cuts = Form("main_ph>%f && main_ph<=%f",ph_lo,ph_hi);
 
         auto sec_df = cutdf1.Filter(cuts.Data());;
  
-	gem_r[ii]=sec_df.Histo1D<Double_t>({Form("gem_r_s%d",ii+1),Form("gem_r_s%d",ii+1),500,600,1100},"gem_r0","rate");
-	gem_ph[ii]=sec_df.Histo1D<Double_t>({Form("gem_ph_s%d",ii+1),Form("gem_ph_s%d",ii+1),100,-Pi(),Pi()},"gem_ph0","rate");
+	gem_r[ii]=sec_df.Histo1D<Double_t>({Form("gem_r_s%d",ii+1),Form("gem_r_s%d",ii+1),250,600,1100},"gem_r0","rate");
+	if(ii==3){
+	  gem_ph[ii]=sec_df.Define("gem_ph0_s3","gem_ph0>0?gem_ph0:gem_ph0+2*Pi()").Histo1D<Double_t>({Form("gem_ph_s%d",ii+1),Form("gem_ph_s%d",ii+1),50,ph_lo,ph_hi},"gem_ph0_s3","rate");
+	}
+	else{
+	  gem_ph[ii]=sec_df.Histo1D<Double_t>({Form("gem_ph_s%d",ii+1),Form("gem_ph_s%d",ii+1),50,ph_lo,ph_hi},"gem_ph0","rate");
+	}
 
 	gem_rp[ii]=sec_df.Define("gemrp","(gem_r1-gem_r0)/(gem_z1-gem_z0)")
-			.Histo1D<Double_t>({Form("gem_r'_s%d",ii+1),Form("gem_r'_s%d",ii+1),500,0,0.1},"gemrp","rate");
+			.Histo1D<Double_t>({Form("gem_r'_s%d",ii+1),Form("gem_r'_s%d",ii+1),250,0,0.1},"gemrp","rate");
 	gem_php[ii]=sec_df.Define("gemphp","(gem_ph1-gem_ph0)/(gem_z1-gem_z0)")
 			.Histo1D<Double_t>({Form("gem_ph'_s%d",ii+1),Form("gem_ph'_s%d",ii+1),500,-2e-5,2e-5},"gemphp","rate");
 

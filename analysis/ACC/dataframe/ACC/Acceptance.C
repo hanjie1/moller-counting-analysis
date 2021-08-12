@@ -5,7 +5,7 @@ void Acceptance(){
    stpw->Start();
    ::Info("", "New analysis method via using RDataFrame is starting:");
 
-   bool check_twohits=false;
+   bool check_twohits=true;
 
    ROOT::EnableImplicitMT();
    auto fileName = Form("/w/halla-scifs17exp/moller12gev/hanjie/remoll/rootfiles/remoll_H1_moller_p%d_newfield*",pass);
@@ -16,9 +16,9 @@ void Acceptance(){
    // cuts
    std::string_view main_el; 
    if(ismoller)
-       main_el="hit.det==28 && hit.pid==11 && hit.mtrid==0 && (hit.trid==1 || hit.trid==2)";   // moller primary events at maine detector
+       main_el="hit.det==28 && hit.pid==11 && hit.mtrid==0 && (hit.trid==1 || hit.trid==2) && hit.r>500";   // moller primary events at maine detector
    else
-       main_el="hit.det==28 && hit.pid==11 && hit.mtrid==0 && hit.trid==1";   // elastic primary events at main detector
+       main_el="hit.det==28 && hit.pid==11 && hit.mtrid==0 && hit.trid==1 && hit.r>500";   // elastic primary events at main detector
 
    // apply cuts and generate new columns
    auto selected_d = d.Define("maindet_hit",main_el).Define("good_hit","Sum(maindet_hit)").Define("trid","hit.trid[maindet_hit]").Filter("good_hit>0");
