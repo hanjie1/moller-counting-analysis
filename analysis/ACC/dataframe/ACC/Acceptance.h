@@ -1,8 +1,8 @@
 using RNode = ROOT::RDF::RNode;
 using namespace TMath;
 
-bool ismoller=false;
-int pass=3;
+bool ismoller=true;
+int pass=5;
 
 double r[7]={650,690,735,790,900,1060,1160};     // radius for the 6 rings
 double ph[7][5];

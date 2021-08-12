@@ -8,7 +8,7 @@ void Acceptance(){
    bool check_twohits=false;
 
    ROOT::EnableImplicitMT();
-   auto fileName = Form("/w/halla-scifs17exp/moller12gev/hanjie/remoll/rootfiles/remoll_C12_elastic_p%dtest*",pass);
+   auto fileName = Form("/w/halla-scifs17exp/moller12gev/hanjie/remoll/rootfiles/remoll_H1_moller_p%d_newfield*",pass);
    auto treeName = "T";
  
    ROOT::RDataFrame d(treeName, fileName);
@@ -76,8 +76,8 @@ void Acceptance(){
    tgph_in = tg_df.Histo1D<Double_t>({"tgph_in","tgph_in",50,-Pi(),Pi()},"part.ph","rate");
    tgp_in = tg_df.Histo1D<Double_t>({"tgp_in","tgp_in",50,0,11000},"part.p","rate");
 
-   tg_thph_in = d.Histo2D<Double_t>({"tg_thph_in","tg_thph_in",50,0,0.024,50,-Pi(),Pi()},"part.th","part.ph","rate");
-   tg_thp_in = d.Histo2D<Double_t>({"tg_thp_in","tg_thp_in",50,0,0.024,50,0,11000},"part.th","part.p","rate");
+   tg_thph_in = tg_df.Histo2D<Double_t>({"tg_thph_in","tg_thph_in",50,0,0.024,50,-Pi(),Pi()},"part.th","part.ph","rate");
+   tg_thp_in = tg_df.Histo2D<Double_t>({"tg_thp_in","tg_thp_in",50,0,0.024,50,0,11000},"part.th","part.p","rate");
 
    std::cout <<"12:  "<< stpw->RealTime() << std::endl;
    stpw->Start();
