@@ -70,7 +70,9 @@ int main(int argc, char** argv){
      T->AddFile(Form("/home/hanjie/moller/remoll/Rootfiles/%s.root",filename.c_str()));
 
      const int ndet = 3;
-     int valid_det[ndet] = {600, 30, 28};  // detector I want to be fired: sieve: 600, GEM: 30, MainDetector: 28
+     int valid_det[ndet] = {60, 30, 28};  // detector I want to be fired: sieve: 600, GEM: 30, MainDetector: 28
+
+     int ntwotrk=0;
 
      vector < remollGenericDetectorHit_t > *fHit = 0;
      vector < remollEventParticle_t > *fPart = 0;
@@ -238,8 +240,10 @@ int main(int argc, char** argv){
 	  sort(gem_b2.begin(), gem_b2.end(), comparetrid);
 	}
 
-	if(nsieve>ntrack || nring>ntrack || ngem>(4*ntrack))
+	if(nsieve>ntrack || nring>ntrack || ngem>(4*ntrack)){
 	  printf("Event %d has multiple hits than expected (nsieve, nring, ngem): %d, %d, %d\n",ii, nsieve, nring, ngem);
+	  ntwotrk++;
+	}
 
 	newT->Fill();
      }
