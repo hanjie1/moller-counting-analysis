@@ -22,7 +22,7 @@ void MainDis(){
        prm_el="hit.pid==11 && hit.mtrid==0 && hit.trid==1";   // elastic primary events at main detector
    }
 
-   auto selected_d = d.Define("primary_hit",prm_el).Define("main","hit.det==28").Define("sieve","hit.det==600").Define("gem","hit.det==30")
+   auto selected_d = d.Define("primary_hit",prm_el).Define("main","hit.det==28").Define("sieve","hit.det==60").Define("gem","hit.det==30")
 		      .Define("good_hit","Sum(primary_hit==1 && main==1)").Define("trid","hit.trid[primary_hit && main]").Filter("good_hit==1");
 
    std::string_view rootname;
