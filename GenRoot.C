@@ -168,7 +168,7 @@ int main(int argc, char** argv){
 	   if( nfound[nn]==ndet ){ valid_trk[nn]=1; total_validtrk++;}
 	   else valid_trk[nn]=0;
 	 }
-
+//cout<<ii<<"   "<<"validtrk:  "<<total_validtrk<<endl;
 	 //if(total_validtrk>1) cout<<"There are "<<total_validtrk<<" valid tracks for event "<<ii<<endl;
 
 	 if(total_validtrk==0) continue;
@@ -203,6 +203,7 @@ int main(int argc, char** argv){
               remollGenericDetectorHit_t hit = fHit->at(jj);
 
 	      int tmptrid = hit.trid-1;
+	      if(tmptrid>1) continue;
               if(hit.pid==11 && hit.mtrid==0 && valid_trk[tmptrid]==1 ){           // two eletrons from the particle gun, for moller events
 		 detHit ahit;
 		 ahit.trid = hit.trid;
@@ -220,7 +221,7 @@ int main(int argc, char** argv){
 
 		 int detid = hit.det;
 		 if(detid==28){ ring.push_back(ahit); nring++;}
-		 if(detid==600){ sieve.push_back(ahit); nsieve++;}
+		 if(detid==60){ sieve.push_back(ahit); nsieve++;}
 		 if(detid==30){
 		    if(ahit.z==19279.5) gem_f1.push_back(ahit);
 		    if(ahit.z==19779.5) gem_f2.push_back(ahit);
@@ -230,7 +231,7 @@ int main(int argc, char** argv){
 		 }
 	      }
 	 }
-
+//cout<<ii<<"   "<<"nring:  "<<nring<<endl;
 	if(ntrack>1){
  	  sort(sieve.begin(), sieve.end(), comparetrid);
 	  sort(ring.begin(), ring.end(), comparetrid);
@@ -240,9 +241,13 @@ int main(int argc, char** argv){
 	  sort(gem_b2.begin(), gem_b2.end(), comparetrid);
 	}
 
-	if(nsieve>ntrack || nring>ntrack || ngem>(4*ntrack)){
+	//if(nsieve>ntrack || nring>ntrack || ngem>(4*ntrack)){
+	if(nring>ntrack){
 	  printf("Event %d has multiple hits than expected (nsieve, nring, ngem): %d, %d, %d\n",ii, nsieve, nring, ngem);
+	}
+	if(ntrack==2){
 	  ntwotrk++;
+	  printf("Event %d has two valid tracks\n",ii);
 	}
 
 	newT->Fill();
@@ -251,5 +256,5 @@ int main(int argc, char** argv){
      newT->Write(); 
      newfile->Close();
 	
-
+     printf("two primary electrons events: %d\n",ntwotrk);
 }
