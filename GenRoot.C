@@ -67,10 +67,10 @@ int main(int argc, char** argv){
      ismoller=atoi(argv[2]);
 
      TChain *T = new TChain("T");
-     T->AddFile(Form("/home/hanjie/moller/remoll/Rootfiles/%s.root",filename.c_str()));
+     T->AddFile(Form("/home/hanjie/moller/remoll_check/twohits_test/remoll/%s.root",filename.c_str()));
 
      const int ndet = 3;
-     int valid_det[ndet] = {60, 30, 28};  // detector I want to be fired: sieve: 600, GEM: 30, MainDetector: 28
+     int valid_det[ndet] = {60,30, 28};  // detector I want to be fired: sieve: 600, GEM: 30, MainDetector: 28
 
      int ntwotrk=0;
 
@@ -94,7 +94,7 @@ int main(int argc, char** argv){
      int ntrack;
      double rate;
 
-     TFile *newfile = new TFile(Form("/home/hanjie/moller/optics_analysis/Rootfiles/sieve1/trackhits_%s_allSD.root",rootfile.c_str()),"RECREATE","hits for valid tracks");
+     TFile *newfile = new TFile(Form("/home/hanjie/moller/optics_analysis/Rootfiles/trackhits_%s_allSD.root",rootfile.c_str()),"RECREATE","hits for valid tracks");
      if(!newfile->IsOpen()) return 0;  
      TTree *newT = new TTree("T","data");
      newT->Branch("sieve", &sieve);
@@ -134,9 +134,9 @@ int main(int argc, char** argv){
 	   cout<<"Warning: the number of tracks is smaller than the avaliable tracks"<<endl;
 	}
 
-         int fire_det[ntrk][8];    // save the fired detector id for each track id
+         int fire_det[ntrk][50];    // save the fired detector id for each track id
          for(int kk=0; kk<ntrk; kk++){
-	   for(int mm=0; mm<8; mm++){
+	   for(int mm=0; mm<50; mm++){
 	      fire_det[kk][mm]=0;
 	   }
 	 }
@@ -147,7 +147,7 @@ int main(int argc, char** argv){
            if(hit.pid==11 && hit.mtrid==0 && (hit.trid==1 || (hit.trid==2 && ismoller==1)) ){           // two eletrons from the particle gun, for moller events
 		int tmpDetID = hit.det;
 		int tmptrkid = hit.trid-1;
-		int is_exist = CheckExist(fire_det[tmptrkid], tmpDetID, 8);
+		int is_exist = CheckExist(fire_det[tmptrkid], tmpDetID, 50);
 		if(is_exist==0){
 		  int tmpN = nfired[tmptrkid];
 		  fire_det[tmptrkid][tmpN]=tmpDetID;       // save the fired detector ID

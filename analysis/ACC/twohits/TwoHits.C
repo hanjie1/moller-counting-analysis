@@ -3,10 +3,11 @@ using namespace TMath;
 void TwoHits(){
 
    TChain *T=new TChain("T");
-   T->Add("/home/hanjie/moller/optics_analysis/Rootfiles/sieve1/trackhits_moller_pass5_LH2_*");
+   T->Add("/home/hanjie/moller/optics_analysis/Rootfiles/trackhits_remoll_test_allSD.root");
 
 
    TString twotrk="ntrk==2 && ring.r[0]>500 && abs(ring.ph[0]-ring.ph[1])>0.001";
+   //TString twotrk="ntrk==2 && ring.r[0]>500";
 
    TH1D* ring_r[2];
    TH2D* ring_ph;
@@ -43,6 +44,14 @@ void TwoHits(){
    ring_r[0]->Draw("HIST");
    ring_r[1]->Draw("HIST same");
    ring_r[0]->SetTitle("two trks ring.r;ring.r;;"); 
+
+   Double_t nhit1 = ring_r[0]->Integral();
+   Double_t nhit2 = ring_r[1]->Integral();
+
+   TLatex tex;
+   tex.SetTextSize(0.03);
+   tex.DrawLatexNDC(.2,.8,Form("N0=%e",nhit1));
+   tex.DrawLatexNDC(.2,.75,Form("N1=%e",nhit2));
    
    TLegend *leg1 = new TLegend(0.6,0.7,0.75,0.85);
    leg1->AddEntry(ring_r[0],"ring.r[0]","L");
@@ -66,6 +75,12 @@ void TwoHits(){
    c1->cd(3);
    T->Draw("ring.r>>ring_r_onehit","rate*(ntrk==1 && ring.r>500)");
    ring_r_onehit->SetTitle("one trk ring.r;ring.r;;"); 
+
+   Double_t nhit3 = ring_r_onehit->Integral();
+
+   TLatex tex1;
+   tex1.SetTextSize(0.03);
+   tex1.DrawLatexNDC(.2,.8,Form("N=%e",nhit3));
 
    c1->cd(4);
    T->Draw("ring.p>>ring_p_onehit","rate*(ntrk==1 && ring.r>500)");
