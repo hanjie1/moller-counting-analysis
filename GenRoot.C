@@ -67,7 +67,7 @@ int main(int argc, char** argv){
      ismoller=atoi(argv[2]);
 
      TChain *T = new TChain("T");
-     T->AddFile(Form("/home/hanjie/moller/remoll_check/twohits_test/remoll/%s.root",filename.c_str()));
+     T->AddFile(Form("/lustre19/expphy/volatile/halla/moller12gev/hanjie/remoll_rootfiles/%s*",filename.c_str()));
 
      const int ndet = 3;
      int valid_det[ndet] = {60,30, 28};  // detector I want to be fired: sieve: 600, GEM: 30, MainDetector: 28
@@ -94,7 +94,7 @@ int main(int argc, char** argv){
      int ntrack;
      double rate;
 
-     TFile *newfile = new TFile(Form("/home/hanjie/moller/optics_analysis/Rootfiles/trackhits_%s_allSD.root",rootfile.c_str()),"RECREATE","hits for valid tracks");
+     TFile *newfile = new TFile(Form("Rootfiles/trackhits_%s.root",rootfile.c_str()),"RECREATE","hits for valid tracks");
      if(!newfile->IsOpen()) return 0;  
      TTree *newT = new TTree("T","data");
      newT->Branch("sieve", &sieve);
@@ -107,7 +107,8 @@ int main(int argc, char** argv){
      newT->Branch("ev", &thisev);
      newT->Branch("ntrk", &ntrack,"ntrack/I");
      newT->Branch("rate", &rate,"rate/D");
-  
+ 
+     int ntwotrk=0; 
      Int_t nentries = T->GetEntries();
      for(Int_t ii=0; ii < nentries; ii++){
          T->GetEntry(ii);

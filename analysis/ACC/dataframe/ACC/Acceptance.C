@@ -8,7 +8,7 @@ void Acceptance(){
    bool check_twohits=true;
 
    ROOT::EnableImplicitMT();
-   auto fileName = Form("/w/halla-scifs17exp/moller12gev/hanjie/remoll/rootfiles/remoll_H1_moller_p%d_newfield*",pass);
+   auto fileName = Form("/lustre19/expphy/volatile/halla/moller12gev/hanjie/remoll_rootfiles/moller_pass%d_LH2_*",pass);
    auto treeName = "T";
  
    ROOT::RDataFrame d(treeName, fileName);

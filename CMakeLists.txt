@@ -53,6 +53,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include ${REMOLL_INCLUDE_DIR})
 #
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/GenRoot*.C)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/GenRoot*.h)
+message(STATUS  "!!! include path: ${headers}")
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
