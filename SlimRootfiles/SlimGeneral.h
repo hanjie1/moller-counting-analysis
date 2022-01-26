@@ -19,7 +19,7 @@ void SlimRootfile(RNode df, std::string_view rootname);
  * 	2=only generate two hits root files
  * 	3=both 1 and 
 ***/
-void GoodEventsMoller(RNode df, int nr){
+void GoodEventsMoller(RNode df, int nr, TString outfile){
 
    auto primary_hit = "hit.pid==11 && hit.mtrid==0 && (hit.trid==1 || hit.trid==2)";
  
@@ -45,20 +45,22 @@ void GoodEventsMoller(RNode df, int nr){
    auto twohits_d = newdf.Filter("ntrk==2");
    auto onehit_d = newdf.Filter("ntrk==1");
 
-   cout<<"Two tracks:  "<<*twohits_d.Count()<<endl;
-   cout<<"One tracks:  "<<*onehit_d.Count()<<endl;
+   //cout<<"Two tracks:  "<<*twohits_d.Count()<<endl;
+   //cout<<"One tracks:  "<<*onehit_d.Count()<<endl;
 
+   auto rootname1=Form("rootfiles/%s_onehit.root",outfile.Data());
+   auto rootname2=Form("rootfiles/%s_twohits.root",outfile.Data());
    switch(nr){
 	case 1: 
-	  SlimRootfile(onehit_d,"onehit.root"); 
+	  SlimRootfile(onehit_d,rootname1); 
 	  break;
 	case 2:
-	  SlimRootfile(twohits_d,"twohits.root"); 
+	  SlimRootfile(twohits_d,rootname2); 
 	  break;
 
 	case 3:
-	  SlimRootfile(onehit_d,"onehit.root"); 
-	  SlimRootfile(twohits_d,"twohits.root"); 
+	  SlimRootfile(onehit_d,rootname1); 
+	  SlimRootfile(twohits_d,rootname2); 
 	  break;
    } 
   
@@ -69,14 +71,15 @@ void GoodEventsMoller(RNode df, int nr){
  * slim the ep or other one primary electron scattering remoll root files: only save primary electron events that reach the main detector
  * @df: remoll root files dataframe
 ***/
-void GoodEventsGeneral(RNode df){
+void GoodEventsGeneral(RNode df, TString outfile){
 
    auto primary_hit = "hit.pid==11 && hit.mtrid==0 && hit.trid==1";
  
    auto selected_df = df.Define("prm_e",primary_hit).Define("main","hit.det==28").Define("sieve","hit.det==60").Define("gem","hit.det==30")
 		    .Define("good_ev","Sum(prm_e && main)").Define("trid","hit.trid[prm_e && main]").Filter("good_ev>0");
 
-   SlimRootfile(selected_df,"general.root"); 
+   auto rootname=Form("rootfiles/%s_slim.root",outfile.Data());
+   SlimRootfile(selected_df,rootname); 
   
    return;
 }
@@ -97,13 +100,13 @@ void SlimRootfile(RNode df, std::string_view rootname){
           .Define("tg_th","part.th").Define("tg_ph","part.ph").Define("tg_p","part.p").Define("tg_vx","part.vx").Define("tg_vy","part.vy").Define("tg_vz","part.vz")
 	  .Define("tg_trid","part.trid").Define("tg_pid","part.pid")
 	  .Define("bm_x","bm.x").Define("bm_y","bm.y").Define("bm_z","bm.z").Define("bm_dx","bm.dx").Define("bm_dy","bm.dy").Define("bm_dz","bm.dz")
-	  .Define("bm_th","bm.th").Define("bm_ph","bm.ph");
+	  .Define("bm_th","bm.th").Define("bm_ph","bm.ph").Define("beamE","ev.beamp");
 
 
      df_small.Snapshot("T",rootname,{"main_r","main_ph","main_x","main_y","main_p","main_trid","sieve_r","sieve_ph","sieve_x","sieve_y","sieve_p","sieve_trid",
         "gem_r","gem_ph","gem_x","gem_y","gem_p","gem_z","gem_trid",
         "tg_th","tg_p","tg_ph","tg_vz","tg_vx","tg_vy","tg_trid","tg_pid","rate",
-	"bm_x","bm_y","bm_z","bm_dx","bm_dy","bm_dz","bm_th","bm_ph"});
+	"bm_x","bm_y","bm_z","bm_dx","bm_dy","bm_dz","bm_th","bm_ph","beamE"});
 
      return;
 }

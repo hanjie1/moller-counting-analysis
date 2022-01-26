@@ -4,6 +4,12 @@ using rvec_i = const RVec<int> &;
 
 using namespace TMath;
 
+struct remollBeamTarget_t {
+  double x, y, z;
+  double dx, dy, dz;
+  double th, ph;
+};
+
 void SlimRootfile(RNode df, std::string_view rootname);
 
 void GoodEvents(RNode df, int nr){   // nr=1: only generate one hit root files, n=2: only generate two hits root files, n=3: generate both cases' rootfiles
@@ -62,12 +68,15 @@ void SlimRootfile(RNode df, std::string_view rootname){
           .Define("gem_r","hit.r[gem && prm_e]").Define("gem_ph","hit.ph[gem && prm_e]").Define("gem_z","hit.z[gem && prm_e]").Define("gem_trid","hit.trid[gem && prm_e]")
           .Define("gem_x","hit.x[gem && prm_e]").Define("gem_y","hit.y[gem && prm_e]").Define("gem_p","hit.p[gem && prm_e]")
           .Define("tg_th","part.th").Define("tg_ph","part.ph").Define("tg_p","part.p").Define("tg_vx","part.vx").Define("tg_vy","part.vy").Define("tg_vz","part.vz")
-	  .Define("tg_trid","part.trid").Define("tg_pid","part.pid");
+	  .Define("tg_trid","part.trid").Define("tg_pid","part.pid")
+	  .Define("bm_x","bm.x").Define("bm_y","bm.y").Define("bm_z","bm.z").Define("bm_dx","bm.dx").Define("bm_dy","bm.dy").Define("bm_dz","bm.dz")
+	  .Define("bm_th","bm.th").Define("bm_ph","bm.ph");
 
 
      df_small.Snapshot("T",rootname,{"main_r","main_ph","main_x","main_y","main_p","main_trid","sieve_r","sieve_ph","sieve_x","sieve_y","sieve_p","sieve_trid",
         "gem_r","gem_ph","gem_x","gem_y","gem_p","gem_z","gem_trid",
-        "tg_th","tg_p","tg_ph","tg_vz","tg_vx","tg_vy","tg_trid","tg_pid","rate"});
+        "tg_th","tg_p","tg_ph","tg_vz","tg_vx","tg_vy","tg_trid","tg_pid","rate",
+	"bm_x","bm_y","bm_z","bm_dx","bm_dy","bm_dz","bm_th","bm_ph"});
 
      return;
 }

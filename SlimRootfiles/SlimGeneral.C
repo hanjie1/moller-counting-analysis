@@ -1,6 +1,7 @@
 #include "SlimGeneral.h"
 
-void SlimGeneral(){
+using namespace std;
+void SlimGeneral(TString infile, TString outfile, bool isMoller){
 
 /*** SlimGeneral
  * generate slimed rootfiles for the primary moller electrons
@@ -20,9 +21,9 @@ void SlimGeneral(){
 
    //auto fileName = "/w/halla-scifs17exp/moller12gev/hanjie/remoll_optics/remoll/rootfiles/moller_pass5_LH2_*";
    
-   bool isMoller=false;
-   TString rootname ="c12_optics1_dsc_ep_pass5";
-   auto fileName = "/lustre19/expphy/volatile/halla/moller12gev/hanjie/remoll_rootfiles/C12_elastic_optics1_dsc_pass5_*";
+   //bool isMoller=false;
+   //TString rootname ="c12_optics1_dsc_ep_pass4";
+   auto fileName = Form("/lustre19/expphy/volatile/halla/moller12gev/hanjie/remoll_rootfiles/%s_*",infile.Data());
    auto treeName = "T";
    ROOT::RDataFrame d(treeName, fileName);
 
@@ -37,23 +38,24 @@ void SlimGeneral(){
 
    if(isMoller){
      int nr=1;   // 1; only generate one hit root file; 2: only generate two hit file; 3: both 1 and 2
-     GoodEventsMoller(d, nr);
-
+     GoodEventsMoller(d, nr, outfile);
+/*
      switch(nr){
 	case 1:
-	  gSystem->Exec(Form("mv onehit.root rootfiles/%s_onehit.root",rootname.Data()));
+	  gSystem->Exec(Form("mv onehit.root rootfiles/%s_onehit.root",outfile.Data()));
 	  break;
 	case 2:
-	  gSystem->Exec(Form("mv twohits.root rootfiles/%s_twohits.root",rootname.Data()));
+	  gSystem->Exec(Form("mv twohits.root rootfiles/%s_twohits.root",outfile.Data()));
 	  break;
 	case 3:
-	  gSystem->Exec(Form("mv onehit.root rootfiles/%s_onehit.root",rootname.Data()));
-	  gSystem->Exec(Form("mv twohits.root rootfiles/%s_twohits.root",rootname.Data()));
+	  gSystem->Exec(Form("mv onehit.root rootfiles/%s_onehit.root",outfile.Data()));
+	  gSystem->Exec(Form("mv twohits.root rootfiles/%s_twohits.root",outfile.Data()));
      }
+*/
    }
    else{
-     GoodEventsGeneral(d);
-     gSystem->Exec(Form("mv general.root rootfiles/%s_slim.root",rootname.Data()));
+     GoodEventsGeneral(d, outfile);
+//     gSystem->Exec(Form("mv general.root rootfiles/%s_slim.root",outfile.Data()));
    }
    
 
