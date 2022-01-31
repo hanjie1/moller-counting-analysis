@@ -16,7 +16,7 @@ void SlimGeneral(TString infile, TString outfile, bool isMoller){
  * 	2=only generate two hits root file
 ***/
 
-   //ROOT::EnableImplicitMT();
+   ROOT::EnableImplicitMT(5);
 
    //auto fileName = "/w/halla-scifs17exp/moller12gev/hanjie/remoll_optics/remoll/rootfiles/moller_pass5_LH2_*";
    
