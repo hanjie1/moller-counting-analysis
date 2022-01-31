@@ -1,15 +1,17 @@
+#include "../../remoll/include/remolltypes.hh"
+
 using RNode  = ROOT::RDF::RNode;
 using namespace ROOT::VecOps;
 using rvec_i = const RVec<int> &;
 
 using namespace TMath;
-
+/*
 struct remollBeamTarget_t {
   double x, y, z;
   double dx, dy, dz;
   double th, ph;
 };
-
+*/
 void SlimRootfile(RNode df, std::string_view rootname);
 
 /***GoodEventsMoller
@@ -19,69 +21,47 @@ void SlimRootfile(RNode df, std::string_view rootname);
  * 	2=only generate two hits root files
  * 	3=both 1 and 
 ***/
-void GoodEventsMoller(RNode df, int nr, TString outfile){
+auto check_trid = [](rvec_i trid) {
+     int newid=1;
+     for(int ii=1; ii<trid.size(); ii++){
+         bool found=false;
+         int jj=0;
+         for(jj=0; jj<ii; jj++){
+            if(trid[jj]==trid[ii])
+               break;
+         }
+         if(jj==ii)newid++;
+     }
+
+     return newid;
+};
+
+RNode GenMollerDF(RNode df){
 
    auto primary_hit = "hit.pid==11 && hit.mtrid==0 && (hit.trid==1 || hit.trid==2)";
  
    auto selected_df = df.Define("prm_e",primary_hit).Define("main","hit.det==28").Define("sieve","hit.det==60").Define("gem","hit.det==30")
+	            .Define("gem_1","hit.z>=19279.5 && hit.z<=19280.5").Define("gem_2","hit.z>=19779.5 && hit.z<=19780.5")
+		    .Define("gem_3","hit.z>=20193.5 && hit.z<=20194.5").Define("gem_4","hit.z>=20693.5 && hit.z<=20694.5")
 		    .Define("good_ev","Sum(prm_e && main)").Define("trid","hit.trid[prm_e && main]").Filter("good_ev>0");
 
-   auto check_trid = [](rvec_i trid) {
-        int newid=1;
-        for(int ii=1; ii<trid.size(); ii++){
-          bool found=false;
-          int jj=0;
-          for(jj=0; jj<ii; jj++){
-             if(trid[jj]==trid[ii])
-                 break;
-          }
-          if(jj==ii)newid++;
-        }
-
-        return newid;
-   };
-
-   auto newdf = selected_df.Define("ntrk",check_trid, {"trid"});
-   auto twohits_d = newdf.Filter("ntrk==2");
-   auto onehit_d = newdf.Filter("ntrk==1");
-
-   //cout<<"Two tracks:  "<<*twohits_d.Count()<<endl;
-   //cout<<"One tracks:  "<<*onehit_d.Count()<<endl;
-
-   auto rootname1=Form("rootfiles/%s_onehit.root",outfile.Data());
-   auto rootname2=Form("rootfiles/%s_twohits.root",outfile.Data());
-   switch(nr){
-	case 1: 
-	  SlimRootfile(onehit_d,rootname1); 
-	  break;
-	case 2:
-	  SlimRootfile(twohits_d,rootname2); 
-	  break;
-
-	case 3:
-	  SlimRootfile(onehit_d,rootname1); 
-	  SlimRootfile(twohits_d,rootname2); 
-	  break;
-   } 
-  
-   return;
+   return selected_df; 
 }
 
 /***GoodEventsGeneral
  * slim the ep or other one primary electron scattering remoll root files: only save primary electron events that reach the main detector
  * @df: remoll root files dataframe
 ***/
-void GoodEventsGeneral(RNode df, TString outfile){
+RNode GenEpDF(RNode df){
 
    auto primary_hit = "hit.pid==11 && hit.mtrid==0 && hit.trid==1";
  
    auto selected_df = df.Define("prm_e",primary_hit).Define("main","hit.det==28").Define("sieve","hit.det==60").Define("gem","hit.det==30")
+	            .Define("gem_1","hit.z>=19279.5 && hit.z<=19280.5").Define("gem_2","hit.z>=19779.5 && hit.z<=19780.5")
+		    .Define("gem_3","hit.z>=20193.5 && hit.z<=20194.5").Define("gem_4","hit.z>=20693.5 && hit.z<=20694.5")
 		    .Define("good_ev","Sum(prm_e && main)").Define("trid","hit.trid[prm_e && main]").Filter("good_ev>0");
-
-   auto rootname=Form("rootfiles/%s_slim.root",outfile.Data());
-   SlimRootfile(selected_df,rootname); 
   
-   return;
+   return selected_df;
 }
 
 /***SlimRootfile
@@ -90,6 +70,7 @@ void GoodEventsGeneral(RNode df, TString outfile){
  * For each event, the slimed root file will save the hit information as for detectors: main, sieve, gem, tg, bm
 ***/
 void SlimRootfile(RNode df, std::string_view rootname){
+
      auto df_small = df.Define("main_trid","hit.trid[main && prm_e]")
           .Define("main_r","hit.r[main && prm_e]").Define("main_ph","hit.ph[main && prm_e]")
           .Define("main_x","hit.x[main && prm_e]").Define("main_y","hit.y[main && prm_e]").Define("main_p","hit.p[main && prm_e]")
@@ -102,7 +83,6 @@ void SlimRootfile(RNode df, std::string_view rootname){
 	  .Define("bm_x","bm.x").Define("bm_y","bm.y").Define("bm_z","bm.z").Define("bm_dx","bm.dx").Define("bm_dy","bm.dy").Define("bm_dz","bm.dz")
 	  .Define("bm_th","bm.th").Define("bm_ph","bm.ph").Define("beamE","ev.beamp");
 
-
      df_small.Snapshot("T",rootname,{"main_r","main_ph","main_x","main_y","main_p","main_trid","sieve_r","sieve_ph","sieve_x","sieve_y","sieve_p","sieve_trid",
         "gem_r","gem_ph","gem_x","gem_y","gem_p","gem_z","gem_trid",
         "tg_th","tg_p","tg_ph","tg_vz","tg_vx","tg_vy","tg_trid","tg_pid","rate",
@@ -110,4 +90,55 @@ void SlimRootfile(RNode df, std::string_view rootname){
 
      return;
 }
+
+/***SlimOneTrkRootfile
+ * @df: dataframe with primary electrons cut applied and one track filter applied
+ * @rootname: name for the generated slim root file
+ * For each event, the slimed root file will save the hit information as for detectors: main, sieve, gem, tg, bm (all single variable not vectors)
+***/
+void SlimOneTrkRootfile(RNode df, std::string_view rootname){
+
+     auto df_small = df.Define("main_trid","hit.trid[main && prm_e][0]")
+          .Define("main_r","hit.r[main && prm_e][0]").Define("main_ph","hit.ph[main && prm_e][0]")
+          .Define("main_x","hit.x[main && prm_e][0]").Define("main_y","hit.y[main && prm_e][0]").Define("main_p","hit.p[main && prm_e][0]")
+          .Define("sieve_trid","hit.trid[sieve && prm_e && hit.trid==main_trid][0]")
+          .Define("sieve_r","hit.r[sieve && prm_e && hit.trid==main_trid][0]").Define("sieve_ph","hit.ph[sieve && prm_e && hit.trid==main_trid][0]")
+          .Define("sieve_x","hit.x[sieve && prm_e && hit.trid==main_trid][0]").Define("sieve_y","hit.y[sieve && prm_e && hit.trid==main_trid][0]")
+ 	  .Define("sieve_p","hit.p[sieve && prm_e && hit.trid==main_trid][0]")
+	  .Define("gem1_trid","hit.trid[gem && prm_e && gem_1 && hit.trid==main_trid][0]")
+          .Define("gem1_r","hit.r[gem && prm_e && gem_1 && hit.trid==main_trid][0]").Define("gem1_ph","hit.ph[gem && prm_e && gem_1 && hit.trid==main_trid][0]")
+	  .Define("gem1_x","hit.x[gem && prm_e && gem_1 && hit.trid==main_trid][0]").Define("gem1_y","hit.y[gem && prm_e && gem_1 && hit.trid==main_trid][0]")
+	  .Define("gem1_p","hit.p[gem && prm_e && gem_1 && hit.trid==main_trid][0]")
+	  .Define("gem2_trid","hit.trid[gem && prm_e && gem_2 && hit.trid==main_trid][0]")
+          .Define("gem2_r","hit.r[gem && prm_e && gem_2 && hit.trid==main_trid][0]").Define("gem2_ph","hit.ph[gem && prm_e && gem_2 && hit.trid==main_trid][0]")
+	  .Define("gem2_x","hit.x[gem && prm_e && gem_2 && hit.trid==main_trid][0]").Define("gem2_y","hit.y[gem && prm_e && gem_2 && hit.trid==main_trid][0]")
+	  .Define("gem2_p","hit.p[gem && prm_e && gem_2 && hit.trid==main_trid][0]")
+	  .Define("gem3_trid","hit.trid[gem && prm_e && gem_3 && hit.trid==main_trid][0]")
+          .Define("gem3_r","hit.r[gem && prm_e && gem_3 && hit.trid==main_trid][0]").Define("gem3_ph","hit.ph[gem && prm_e && gem_3 && hit.trid==main_trid][0]")
+	  .Define("gem3_x","hit.x[gem && prm_e && gem_3 && hit.trid==main_trid][0]").Define("gem3_y","hit.y[gem && prm_e && gem_3 && hit.trid==main_trid][0]")
+	  .Define("gem3_p","hit.p[gem && prm_e && gem_3 && hit.trid==main_trid][0]")
+	  .Define("gem4_trid","hit.trid[gem && prm_e && gem_4 && hit.trid==main_trid][0]")
+          .Define("gem4_r","hit.r[gem && prm_e && gem_4 && hit.trid==main_trid][0]").Define("gem4_ph","hit.ph[gem && prm_e && gem_4 && hit.trid==main_trid][0]")
+	  .Define("gem4_x","hit.x[gem && prm_e && gem_4 && hit.trid==main_trid][0]").Define("gem4_y","hit.y[gem && prm_e && gem_4 && hit.trid==main_trid][0]")
+	  .Define("gem4_p","hit.p[gem && prm_e && gem_4 && hit.trid==main_trid][0]")
+          .Define("tg_th","part.th[part.trid==main_trid][0]").Define("tg_ph","part.ph[part.trid==main_trid][0]").Define("tg_p","part.p[part.trid==main_trid][0]")
+	  .Define("tg_vx","part.vx[part.trid==main_trid][0]").Define("tg_vy","part.vy[part.trid==main_trid][0]").Define("tg_vz","part.vz[part.trid==main_trid][0]")
+	  .Define("tg_trid","part.trid[part.trid==main_trid]").Define("tg_pid","part.pid[part.trid==main_trid]")
+	  .Define("bm_x","bm.x").Define("bm_y","bm.y").Define("bm_z","bm.z").Define("bm_dx","bm.dx").Define("bm_dy","bm.dy").Define("bm_dz","bm.dz")
+	  .Define("bm_th","bm.th").Define("bm_ph","bm.ph").Define("beamE","ev.beamp");
+
+     df_small.Snapshot("newT",rootname,{"main_r","main_ph","main_x","main_y","main_p","main_trid","sieve_r","sieve_ph","sieve_x","sieve_y","sieve_p","sieve_trid",
+        "gem1_r","gem1_ph","gem1_x","gem1_y","gem1_p","gem1_trid",
+        "gem2_r","gem2_ph","gem2_x","gem2_y","gem2_p","gem2_trid",
+        "gem3_r","gem3_ph","gem3_x","gem3_y","gem3_p","gem3_trid",
+        "gem4_r","gem4_ph","gem4_x","gem4_y","gem4_p","gem4_trid",
+        "tg_th","tg_p","tg_ph","tg_vz","tg_vx","tg_vy","tg_trid","tg_pid","rate",
+	"bm_x","bm_y","bm_z","bm_dx","bm_dy","bm_dz","bm_th","bm_ph","beamE"});
+ 
+//     auto d2=df_small.Display({"main_r","main_trid","sieve_trid","sieve_r","tg_trid","gem1_trid"},10);
+//     d2->Print();
+     return;
+
+}
+
 
