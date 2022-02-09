@@ -16,16 +16,16 @@ void SlimGeneral(TString infile, TString outfile, bool isMoller){
  * 	2=only generate two hits root file
 ***/
 
-   ROOT::EnableImplicitMT(5);
+   ROOT::EnableImplicitMT(5);  // 5 = the number of root files being chained
 
    //auto fileName = "/w/halla-scifs17exp/moller12gev/hanjie/remoll_optics/remoll/rootfiles/moller_pass5_LH2_*";
    
    //bool isMoller=false;
    //TString rootname ="c12_optics1_dsc_ep_pass4";
-   //auto fileName = Form("/lustre19/expphy/volatile/halla/moller12gev/hanjie/remoll_rootfiles/%s*",infile.Data());
-   //auto treeName = "T";
-   //ROOT::RDataFrame d(treeName, fileName);
-
+   auto fileName = Form("/lustre19/expphy/volatile/halla/moller12gev/hanjie/remoll_rootfiles/%s*",infile.Data());
+   auto treeName = "T";
+   ROOT::RDataFrame d(treeName, fileName);
+/*
    TChain chain("T");
    chain.Add("/lustre19/expphy/volatile/halla/moller12gev/hanjie/remoll_rootfiles/moller_pass5_LH2_1.root");
    chain.Add("/lustre19/expphy/volatile/halla/moller12gev/hanjie/remoll_rootfiles/moller_pass5_LH2_2.root");
@@ -34,7 +34,7 @@ void SlimGeneral(TString infile, TString outfile, bool isMoller){
    chain.Add("/lustre19/expphy/volatile/halla/moller12gev/hanjie/remoll_rootfiles/moller_pass5_LH2_5.root");
  
    ROOT::RDataFrame d(chain);
-
+*/
    if(isMoller){
      int nr=1;   // 1; only generate one hit root file; 2: only generate two hit file;
      auto d_new=GenMollerDF(d);

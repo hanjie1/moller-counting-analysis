@@ -5,3 +5,5 @@ build/*
 *.d
 *.png
 *.pdf
+OpticsMatrix/venv/*
+OpticsMatrix/__pycache__/*
