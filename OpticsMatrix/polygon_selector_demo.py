@@ -56,10 +56,13 @@ class SelectFromCollection:
     def onselect(self, verts):
         path = Path(verts)
         self.ind = np.nonzero(path.contains_points(self.xys))[0]
+#        print('\nSelected points:')
+#        print(self.xys[self.ind])
         self.fc[:, -1] = self.alpha_other
         self.fc[self.ind, -1] = 1
         self.collection.set_facecolors(self.fc)
         self.canvas.draw_idle()
+       
 
     def disconnect(self):
         self.poly.disconnect_events()
@@ -77,16 +80,16 @@ if __name__ == '__main__':
     grid_y = np.repeat(np.arange(grid_size), grid_size)
     pts = ax.scatter(grid_x, grid_y)
 
-    selector = SelectFromCollection(ax, pts)
+    selector1 = SelectFromCollection(ax, pts)
+    plt.show()
 
     print("Select points in the figure by enclosing them within a polygon.")
     print("Press the 'esc' key to start a new polygon.")
     print("Try holding the 'shift' key to move all of the vertices.")
     print("Try holding the 'ctrl' key to move a single vertex.")
 
-    plt.show()
 
-    selector.disconnect()
+    selector1.disconnect()
 
     # After figure is closed print the coordinates of the selected points
     print('\nSelected points:')
