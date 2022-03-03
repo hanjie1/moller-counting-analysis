@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from polygon_selector_demo import SelectFromCollection
 from scipy.stats import gaussian_kde
+from sklearn.preprocessing import PolynomialFeatures
 
 
 class OPTICS:
@@ -120,16 +121,24 @@ class OPTICS:
         self.selected=df.loc[df.index[selector.ind]]
 #        self.selected=np.take(geo, selector.ind, axis=0)   # use this when using numpy arrays
 
-#    def GenCSV(self, hole_id):
+    def GenCSV(self, hole_id):
 
         df=self.selected
         df["gem1_rp"]=(df.gem1_x*df.gem1_px+df.gem1_y*df.gem1_py)/(df.gem1_r*df.gem1_pz)       #  gem 1 r'
         df["gem1_php"]=(-df.gem1_y*df.gem1_px+df.gem1_x*df.gem1_py)/(df.gem1_r*df.gem1_pz)     #  gem 1 phi'
 
-        hole_id="1"
         filename="output/SieveHole_"+hole_id+".csv"
         header=["tg_th","tg_ph","tg_vz","tg_p","gem1_r","gem1_rp","gem1_ph","gem1_php"]
         df.to_csv(filename,columns=header)
+
+    def PolynomialRegression(self, X, y, degree):  # X is the GEM variables in numpy array, y is the target variable 
+
+        poly = PolynomialFeatures(degree)
+        poly.fit_transform(X)
+        
+
+
+
 
 
 if __name__=='__main__':
@@ -142,9 +151,9 @@ if __name__=='__main__':
     #optics.DrawScatterPlot(optics.sec1)   # Draw the scatter plot of a sector with density as the color
     optics.SelectOneHole(optics.sec1)
 
-    #hole_id=int(input("Hole ID: "))	
-    #input("Hole ID: ")	
-    #optics.GenCSV(hole_id)
+    #hole_id=input("Hole ID: ") # give segmenration fault, apparaently different systems have a different way of taking keyboard input in python
+    hole_id="11"
+    optics.GenCSV(hole_id)
 
 
 
