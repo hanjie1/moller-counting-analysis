@@ -5,7 +5,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from polygon_selector_demo import SelectFromCollection
 from scipy.stats import gaussian_kde
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn import linear_model
 
 
 class OPTICS:
@@ -88,20 +90,19 @@ class OPTICS:
         plt.show()
 
 
-    def DrawScatterPlot(self,df):
+    def DrawScatterPlot(self,x,y):   # x, y are pandas dataframe
 
-        xy = np.vstack([df.gem1_x,df.gem1_y])
+        xy = np.vstack([x,y])
         density = gaussian_kde(xy)(xy)
 
         # Sort the points by density, so that the densest points are plotted last
         idx = density.argsort()
-        x, y, z = df.iloc[idx].gem1_x, df.iloc[idx].gem1_y, density[idx]
+        #print(type(x))
+        newx, newy, z = x.iloc[idx], y.iloc[idx], density[idx]
 
         fig, ax = plt.subplots()
-        ax.scatter(x, y, c=z, s=50)
+        ax.scatter(newx, newy, c=z, s=50)
         plt.show()
-
-
 
     def SelectOneHole(self, df):
 
@@ -121,22 +122,31 @@ class OPTICS:
         self.selected=df.loc[df.index[selector.ind]]
 #        self.selected=np.take(geo, selector.ind, axis=0)   # use this when using numpy arrays
 
-    def GenCSV(self, hole_id):
+    def GenCSV(self, hole_id, filename):
 
         df=self.selected
         df["gem1_rp"]=(df.gem1_x*df.gem1_px+df.gem1_y*df.gem1_py)/(df.gem1_r*df.gem1_pz)       #  gem 1 r'
         df["gem1_php"]=(-df.gem1_y*df.gem1_px+df.gem1_x*df.gem1_py)/(df.gem1_r*df.gem1_pz)     #  gem 1 phi'
 
-        filename="output/SieveHole_"+hole_id+".csv"
         header=["tg_th","tg_ph","tg_vz","tg_p","gem1_r","gem1_rp","gem1_ph","gem1_php"]
         df.to_csv(filename,columns=header)
 
-    def PolynomialRegression(self, X, y, degree):  # X is the GEM variables in numpy array, y is the target variable 
+    def PolynomialRegression(self, X, y, degree, params):  # X is the GEM variables in numpy array, y is the target variable 
+
+        X_train,X_test,y_train,y_test=train_test_split(X, y, test_size=0.33, random_state=42) # split the data into traning set and test set
+
 
         poly = PolynomialFeatures(degree)
-        poly.fit_transform(X)
-        
+        X_train_new=poly.fit_transform(X_train)   # transform columns into polynomial columns
+        X_test_new=poly.fit_transform(X_test)
 
+        #print(X_train_new)
+        regression = linear_model.LinearRegression()
+
+        model = regression.fit(X_train_new, y_train)
+        params = model.coef_
+        #score = model.score(X_test_new, y_test)
+        #print("score:  ", score)
 
 
 
@@ -145,17 +155,28 @@ if __name__=='__main__':
 
     optics=OPTICS()
 
-    optics.GenNumpyArray("C12_elastic_optics2_usc_pass3_slim.root")
-    optics.DefineSectors()
+    #optics.GenNumpyArray("C12_elastic_optics2_usc_pass3_slim.root")
+    #optics.DefineSectors()
     #optics.DrawHistAllSectors()     # Draw the 2D histogram of the GEM 1 y vs. x
-    #optics.DrawScatterPlot(optics.sec1)   # Draw the scatter plot of a sector with density as the color
-    optics.SelectOneHole(optics.sec1)
+    #optics.DrawScatterPlot(optics.sec1.gem1_x, optics.sec1.gem1_y)   # Draw the scatter plot of a sector with density as the color
+    #optics.SelectOneHole(optics.sec1)
 
     #hole_id=input("Hole ID: ") # give segmenration fault, apparaently different systems have a different way of taking keyboard input in python
     hole_id="11"
-    optics.GenCSV(hole_id)
+    filename="output/SieveHole_"+hole_id+".csv"
+    #optics.GenCSV(hole_id, filename)
 
+    df=pd.read_csv(filename)
 
+    #optics.DrawScatterPlot(df.gem1_rp,df.tg_th)
+    X=df.iloc[:,5:7]    # (gem_r, gem_r')
+    y=df.iloc[:,1:2]    # tg_th
+    optics.PolynomialRegression(X, y, 2)  
+    
+    ax = plt.axes(projection='3d')
+    ax.scatter3D(df.gem1_r, df.gem1_rp, df.tg_th, c=df.tg_th, cmap='Greens')
+    plt.show()
+    
 
 
 
