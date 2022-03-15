@@ -131,7 +131,7 @@ class OPTICS:
         header=["tg_th","tg_ph","tg_vz","tg_p","gem1_r","gem1_rp","gem1_ph","gem1_php"]
         df.to_csv(filename,columns=header)
 
-    def PolynomialRegression(self, X, y, degree, params):  # X is the GEM variables in numpy array, y is the target variable 
+    def PolynomialRegression(self, X, y, degree):  # X is the GEM variables in numpy array, y is the target variable 
 
         X_train,X_test,y_train,y_test=train_test_split(X, y, test_size=0.33, random_state=42) # split the data into traning set and test set
 
@@ -144,10 +144,50 @@ class OPTICS:
         regression = linear_model.LinearRegression()
 
         model = regression.fit(X_train_new, y_train)
+        y_pred = regression.predict(X_test_new)
+ 
+
         params = model.coef_
+        self.TestFit(X_test,y_test,params[0])
+
         #score = model.score(X_test_new, y_test)
         #print("score:  ", score)
 
+    def TestFit(self, X, y, params):
+
+        x1_min=np.amin(X[:,[0]])
+        x1_max=np.amax(X[:,[0]])
+
+        x2_min=np.amin(X[:,[1]])
+        x2_max=np.amax(X[:,[1]])
+
+
+        print(x1_min, x1_max)
+        print(x2_min, x2_max)
+
+        print(params)
+
+        r=np.linspace(x1_min,x1_max)
+        rp=np.linspace(x2_min,x2_max)
+        func = lambda x1,x2: params[0]+params[1]*x1+params[2]*x2+params[3]*x1**2+params[4]*x1*x2+params[5]*x2**2
+        y_pred = [func(i1,i2) for i1,i2 in zip(r,rp)]
+#        print(y_pred)
+        print(params)
+        for i1, i2 in zip(r,rp):
+            print(i1,i2)
+            tmp_y = params[0]+params[1]*i1+params[2]*i2+params[3]*(i1**2)+params[4]*i1*i2+params[5]*(i2**2)
+            print(tmp_y)
+
+
+
+
+        plt.scatter(X[:,[0]], y, color="black")
+        plt.plot(r, y_pred, color="blue", linewidth=3)
+
+        plt.xticks(())
+        plt.yticks(())
+
+        #plt.show()
 
 
 
@@ -169,13 +209,32 @@ if __name__=='__main__':
     df=pd.read_csv(filename)
 
     #optics.DrawScatterPlot(df.gem1_rp,df.tg_th)
-    X=df.iloc[:,5:7]    # (gem_r, gem_r')
-    y=df.iloc[:,1:2]    # tg_th
-    optics.PolynomialRegression(X, y, 2)  
+    df_np=df.to_numpy()
+    #X=df.iloc[:,5:7]    # (gem_r, gem_r')
+    #y=df.iloc[:,1:2]    # tg_th
     
-    ax = plt.axes(projection='3d')
-    ax.scatter3D(df.gem1_r, df.gem1_rp, df.tg_th, c=df.tg_th, cmap='Greens')
-    plt.show()
+    X=df_np[:,5:7]
+    y=df_np[:,1:2]
+    optics.PolynomialRegression(X, y, 2)  
+
+#    x1_min=X.iloc[:,[0]].min()[0]
+#    x1_max=X.iloc[:,[0]].max()[0]
+
+#    x2_min=X.iloc[:,[1]].min()[0]
+#    x2_max=X.iloc[:,[1]].max()[0]
+
+#    print(x1_min, x1_max)
+#    print(x2_min, x2_max)
+#    print(params[0])
+
+#    r=np.linspace(x1_min,x1_max)
+#    rp=np.linspace(x2_min,x2_max)
+
+    
+    
+    #ax = plt.axes(projection='3d')
+    #ax.scatter3D(df.gem1_r, df.gem1_rp, df.tg_th, c=df.tg_th, cmap='Greens')
+    #plt.show()
     
 
 
