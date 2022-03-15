@@ -146,14 +146,26 @@ class OPTICS:
         model = regression.fit(X_train_new, y_train)
         y_pred = regression.predict(X_test_new)
  
-
         params = model.coef_
-        self.TestFit(X_test,y_test,params[0])
+        intercept = model.intercept_
+
+#        ax = plt.axes(projection='3d')
+#        ax.scatter3D(X_test[:,[0]], X_test[:,[1]], y_test, c=y_test, cmap='Greens')
+#        ax.scatter3D(X_test[:,[0]], X_test[:,[1]], y_pred, c=y_pred, cmap='Reds')
+#        plt.show()
+
+        ax = plt.axes()
+        ax.scatter(X_test[:,[1]], y_test, c=y_test, cmap='Greens')
+        ax.scatter(X_test[:,[1]], y_pred, c=y_pred, cmap='Reds')
+        plt.show()
+
+
+        #self.TestFit(X_test,y_test,params[0],intercept)
 
         #score = model.score(X_test_new, y_test)
         #print("score:  ", score)
 
-    def TestFit(self, X, y, params):
+    def TestFit(self, X, y, params, intercept):
 
         x1_min=np.amin(X[:,[0]])
         x1_max=np.amax(X[:,[0]])
@@ -169,17 +181,8 @@ class OPTICS:
 
         r=np.linspace(x1_min,x1_max)
         rp=np.linspace(x2_min,x2_max)
-        func = lambda x1,x2: params[0]+params[1]*x1+params[2]*x2+params[3]*x1**2+params[4]*x1*x2+params[5]*x2**2
+        func = lambda x1,x2: params[0]+params[1]*x1+params[2]*x2+params[3]*x1**2+params[4]*x1*x2+params[5]*x2**2+intercept
         y_pred = [func(i1,i2) for i1,i2 in zip(r,rp)]
-#        print(y_pred)
-        print(params)
-        for i1, i2 in zip(r,rp):
-            print(i1,i2)
-            tmp_y = params[0]+params[1]*i1+params[2]*i2+params[3]*(i1**2)+params[4]*i1*i2+params[5]*(i2**2)
-            print(tmp_y)
-
-
-
 
         plt.scatter(X[:,[0]], y, color="black")
         plt.plot(r, y_pred, color="blue", linewidth=3)
@@ -187,7 +190,7 @@ class OPTICS:
         plt.xticks(())
         plt.yticks(())
 
-        #plt.show()
+        plt.show()
 
 
 
