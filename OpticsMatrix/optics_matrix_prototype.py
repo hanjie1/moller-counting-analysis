@@ -32,7 +32,7 @@ class OPTICS:
         file = uproot.open("../SlimRootfiles/rootfiles/"+filename)
         T=file["newT"]
 
-        geo = T.arrays(["gem1_x", "gem1_y","gem1_r","gem1_ph","gem1_px","gem1_py","gem1_pz","tg_th","tg_ph","tg_vz","tg_p"],library="pd")  # panda dictionary
+        geo = T.arrays(["gem1_x", "gem1_y","gem1_r","gem1_ph","gem1_px","gem1_py","gem1_pz","tg_th","tg_ph","tg_vz","tg_p","rate"],library="pd")  # panda dictionary
         geo = geo.loc[geo["gem1_r"]>300]
 
         self.orig=geo
@@ -109,6 +109,19 @@ class OPTICS:
         fig, ax = plt.subplots(figsize=(10,7))
 
         pts=ax.scatter(df.gem1_x,df.gem1_y)
+
+        y_max=df.gem1_y.max()
+        y_min=df.gem1_y.min()
+        dy = (y_max-y_min)*0.1
+
+        x_max=df.gem1_x.max()
+        x_min=df.gem1_x.min()
+        dx = (x_max-x_min)*0.1
+
+        ax.set_ylim(y_min-dy, y_max+dy)
+        ax.set_xlim(x_min-dx, x_max+dx)
+
+
         selector = SelectFromCollection(ax, pts)
 
         print("Select points in the figure by enclosing them within a polygon.")
@@ -198,27 +211,29 @@ if __name__=='__main__':
 
     optics=OPTICS()
 
-    #optics.GenNumpyArray("C12_elastic_optics2_usc_pass3_slim.root")
-    #optics.DefineSectors()
+    optics.GenNumpyArray("C12_elastic_optics2_usc_pass3_slim.root")
+    optics.DefineSectors()
     #optics.DrawHistAllSectors()     # Draw the 2D histogram of the GEM 1 y vs. x
     #optics.DrawScatterPlot(optics.sec1.gem1_x, optics.sec1.gem1_y)   # Draw the scatter plot of a sector with density as the color
-    #optics.SelectOneHole(optics.sec1)
+    optics.SelectOneHole(optics.sec7)
 
     #hole_id=input("Hole ID: ") # give segmenration fault, apparaently different systems have a different way of taking keyboard input in python
-    hole_id="11"
+    #hole_id="72"
     filename="output/SieveHole_"+hole_id+".csv"
     #optics.GenCSV(hole_id, filename)
 
-    df=pd.read_csv(filename)
+    all_file[16]={"11","12","13","14","21","22","31","32","41","42","51","52","61","62","71","72"}
+    for a_file in all_file:
+        df=pd.read_csv(filename)
 
     #optics.DrawScatterPlot(df.gem1_rp,df.tg_th)
-    df_np=df.to_numpy()
+    #df_np=df.to_numpy()
     #X=df.iloc[:,5:7]    # (gem_r, gem_r')
     #y=df.iloc[:,1:2]    # tg_th
     
-    X=df_np[:,5:7]
-    y=df_np[:,1:2]
-    optics.PolynomialRegression(X, y, 2)  
+   # X=df_np[:,5:7]
+   # y=df_np[:,1:2]
+    #optics.PolynomialRegression(X, y, 2)  
 
 #    x1_min=X.iloc[:,[0]].min()[0]
 #    x1_max=X.iloc[:,[0]].max()[0]
