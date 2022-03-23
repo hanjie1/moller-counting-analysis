@@ -168,15 +168,17 @@ class OPTICS:
 #        plt.show()
 
         ax = plt.axes()
-        ax.scatter(X_test[:,[1]], y_test, c=y_test, cmap='Greens')
-        ax.scatter(X_test[:,[1]], y_pred, c=y_pred, cmap='Reds')
+        #ax.scatter(X_test[:,[1]], y_test, c=y_test, cmap='Greens')
+        ax.scatter(X_test[:,[0]], y_test, cmap='Greens')
+        #ax.scatter(X_test[:,[1]], y_pred, c=y_pred, cmap='Reds')
+        ax.scatter(X_test[:,[0]], y_pred, cmap='Reds')
         plt.show()
 
 
         #self.TestFit(X_test,y_test,params[0],intercept)
 
-        #score = model.score(X_test_new, y_test)
-        #print("score:  ", score)
+        score = model.score(X_test_new, y_test)
+        print("score:  ", score)
 
     def TestFit(self, X, y, params, intercept):
 
@@ -211,29 +213,32 @@ if __name__=='__main__':
 
     optics=OPTICS()
 
-    optics.GenNumpyArray("C12_elastic_optics2_usc_pass3_slim.root")
-    optics.DefineSectors()
+    #optics.GenNumpyArray("C12_elastic_optics2_usc_pass3_slim.root")
+    #optics.DefineSectors()
     #optics.DrawHistAllSectors()     # Draw the 2D histogram of the GEM 1 y vs. x
     #optics.DrawScatterPlot(optics.sec1.gem1_x, optics.sec1.gem1_y)   # Draw the scatter plot of a sector with density as the color
-    optics.SelectOneHole(optics.sec7)
+    #optics.SelectOneHole(optics.sec7)
 
     #hole_id=input("Hole ID: ") # give segmenration fault, apparaently different systems have a different way of taking keyboard input in python
     #hole_id="72"
-    filename="output/SieveHole_"+hole_id+".csv"
+    #filename="output/SieveHole_"+hole_id+".csv"
     #optics.GenCSV(hole_id, filename)
 
-    all_file[16]={"11","12","13","14","21","22","31","32","41","42","51","52","61","62","71","72"}
+    all_file=["11","12","13","14","21","22","31","32","41","42","51","52","61","62","71","72"]
+    all_df = pd.DataFrame()
     for a_file in all_file:
-        df=pd.read_csv(filename)
+        file_new = "output/SieveHole_"+a_file+".csv"
+        df_new=pd.read_csv(file_new)
+        all_df = pd.concat([all_df,df_new],axis=0)
 
     #optics.DrawScatterPlot(df.gem1_rp,df.tg_th)
-    #df_np=df.to_numpy()
+    df_np=all_df.to_numpy()
     #X=df.iloc[:,5:7]    # (gem_r, gem_r')
     #y=df.iloc[:,1:2]    # tg_th
     
-   # X=df_np[:,5:7]
-   # y=df_np[:,1:2]
-    #optics.PolynomialRegression(X, y, 2)  
+    X=df_np[:,5:7]
+    y=df_np[:,1:2]
+    optics.PolynomialRegression(X, y, 2)  
 
 #    x1_min=X.iloc[:,[0]].min()[0]
 #    x1_max=X.iloc[:,[0]].max()[0]
